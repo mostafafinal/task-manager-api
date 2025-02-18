@@ -6,7 +6,8 @@
   "scripts": {
    "start": "node index.js",
     "build": "rimraf dist && tsc",
-    "dev": "ts-node-dev --poll --files src/index.ts"
+    "dev": "ts-node-dev --poll --files src/index.ts",
+    "vercel-build": "echo hello"
   },
   "keywords": [],
   "author": "",
