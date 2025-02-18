@@ -12,6 +12,11 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Root endpoint
+app.get("/", (req, res) => {
+  res.send("Server works!");
+});
+
 // Database connection
 let isConnected = false;
 mongoose
