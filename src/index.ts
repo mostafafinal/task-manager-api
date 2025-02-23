@@ -1,7 +1,6 @@
-import express from "express";
-import cors from "cors";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -13,29 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 // Root endpoint
-app.get("/", (req, res) => {
-  res.send("Server works!");
-});
-
-// Database connection
-let isConnected = false;
-mongoose
-  .connect(process.env.MONGO_URL as string)
-  .then(() => {
-    isConnected = true;
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-    isConnected = false;
-  });
-
-// Status endpoint
-app.get("/api/status", (req, res) => {
-  res.json({
-    server: true,
-    database: isConnected,
-  });
+app.get('/', (req, res) => {
+  res.json({ message: 'Hello World!' });
 });
 
 // Error handling middleware
@@ -47,7 +25,7 @@ app.use(
     next: express.NextFunction
   ) => {
     console.error(err.stack);
-    res.status(500).json({ error: "Something broke!" });
+    res.status(500).json({ error: 'Something broke!' });
   }
 );
 
@@ -55,3 +33,5 @@ app.use(
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+export default app;
