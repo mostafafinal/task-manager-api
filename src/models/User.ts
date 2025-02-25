@@ -23,8 +23,8 @@ const userSchema = new Schema<IUser, UserModel>({
 
 userSchema.static(
   "checkUserByEmail",
-  async function checkUserByEmail(userEmail: string): Promise<boolean> {
-    const user = await this.where({ email: userEmail });
+  async function checkUserByEmail(userEmail) {
+    const user = await this.findOne({ email: userEmail });
 
     if (user) return true;
 

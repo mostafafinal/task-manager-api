@@ -8,5 +8,5 @@ export interface IUser {
 }
 
 export interface UserModel extends Model<IUser> {
-  checkUserByEmail(email: string): boolean;
+  checkUserByEmail(email: string): Promise<boolean>;
 }
