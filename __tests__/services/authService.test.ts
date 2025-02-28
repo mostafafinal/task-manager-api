@@ -5,35 +5,33 @@ import { IUser } from "../../src/interfaces/schemas";
 import { User } from "../../src/models/User";
 
 describe("User Authentication Test", () => {
-    let user: IUser;
+  let user: IUser;
 
-    beforeAll(async () => await connectDBForTesting());
+  beforeAll(async () => await connectDBForTesting());
 
-    afterAll(async () => {
-        await User.collection.drop();
+  afterAll(async () => {
+    // await User.collection.drop();
 
-        await closeDBForTesting();
+    await closeDBForTesting();
+  });
+
+  beforeEach(() => {
+    user = {
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    };
+  });
+
+  const createUser = async () => await registerUser(user);
+
+  test("User Register Test", async () => {
+    const createdUser = await createUser();
+
+    expect(createdUser).toMatchObject<IUser>({
+      ...user,
+      password: createdUser.password,
     });
-
-    beforeEach(() => {
-        user = {
-            firstName: faker.person.firstName(),
-            lastName: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password(),
-        };
-    });
-
-    test("User Register Test", async () => {
-        const createdUser = await registerUser(user);
-
-        expect(createdUser).toMatchObject<IUser>({
-            ...user,
-            password: createdUser.password,
-        });
-    });
-
-    test("User Login Test", async () => {
-        const login = await loginUser({email: user.email, password: user.password})l
-    })
+  });
 });
