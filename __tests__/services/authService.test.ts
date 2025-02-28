@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { registerUser } from "../../src/services/authService";
+import { registerUser, loginUser } from "../../src/services/authService";
 import { closeDBForTesting, connectDBForTesting } from "../prePostTesting";
 import { IUser } from "../../src/interfaces/schemas";
 import { User } from "../../src/models/User";
@@ -32,4 +32,8 @@ describe("User Authentication Test", () => {
             password: createdUser.password,
         });
     });
+
+    test("User Login Test", async () => {
+        const login = await loginUser({email: user.email, password: user.password})l
+    })
 });
