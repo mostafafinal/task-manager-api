@@ -1,6 +1,6 @@
-import { RegisterUser } from "../interfaces/authService";
+import { LoginUser, RegisterUser } from "../interfaces/authService";
 import { User } from "../models/User";
-import { hashPassword } from "../utils/bcryption";
+import { hashPassword, verifyPassword } from "../utils/bcryption";
 
 export const registerUser: RegisterUser["registerUser"] = async (userData) => {
   try {
@@ -18,6 +18,27 @@ export const registerUser: RegisterUser["registerUser"] = async (userData) => {
     return user.toObject();
   } catch (error) {
     console.error(error);
+
+    throw error;
+  }
+};
+
+export const loginUser: LoginUser["loginUser"] = async (userData) => {
+  try {
+    const user = await User.getUser(userData.email);
+
+    if (!user) throw new Error("User is not existed");
+    console.log(userData.password);
+    const checkPassword = await verifyPassword(
+      userData.password,
+      user.password
+    );
+
+    if (!checkPassword) throw new Error("Password's not correct");
+
+    return "Logged in successfully!";
+  } catch (error) {
+    console.error(`error`);
 
     throw error;
   }
