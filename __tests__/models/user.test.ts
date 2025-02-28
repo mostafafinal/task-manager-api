@@ -38,4 +38,12 @@ describe("User model testing", () => {
 
     expect(isExisted).toBe(true);
   });
+
+  test("Get user test", async () => {
+    await new User({ ...user }).save();
+
+    const getUser = await User.getUser(user.email);
+
+    expect(getUser).toMatchObject<IUser>({ ...getUser });
+  });
 });
