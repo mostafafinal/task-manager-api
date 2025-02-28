@@ -4,36 +4,38 @@ import { faker } from "@faker-js/faker";
 import { IUser } from "../../src/interfaces/schemas";
 
 describe("User model testing", () => {
-    let user: IUser;
+  let user: IUser;
 
-    beforeAll(async () => await connectDBForTesting());
+  beforeAll(async () => await connectDBForTesting());
 
-    afterAll(async () => {
-        await User.collection.drop();
-        await closeDBForTesting();
+  afterAll(async () => {
+    // await User.collection.drop();
+    await closeDBForTesting();
+  });
+
+  beforeEach(() => {
+    user = {
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    };
+  });
+
+  test("User creation test", async () => {
+    const createUser = new User({ ...user });
+    const createdUser = await createUser.save();
+
+    expect(createdUser).toMatchObject({
+      ...user,
     });
+  });
 
-    beforeEach(() => {
-        user = {
-            firstName: faker.person.firstName(),
-            lastName: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password(),
-        };
-    });
+  test("User existence test", async () => {
+    await new User({ ...user }).save();
 
-    test("User creation test", async () => {
-        const createUser = new User({ ...user });
-        const createdUser = await createUser.save();
+    const isExisted = await User.checkUserByEmail(user.email);
 
-        expect(createdUser).toMatchObject({
-            ...user,
-        });
-    });
-
-    test("User existence test", async () => {
-        const isExisted = await User.checkUserByEmail(user.email);
-
-        expect(isExisted).toBe(true);
-    });
+    expect(isExisted).toBe(true);
+  });
 });
