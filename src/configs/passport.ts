@@ -1,5 +1,5 @@
 import passport from "passport";
-import { IStrategyOptions, Strategy as LocalStrategy, Strategy, VerifyFunction } from "passport-local";
+import { IStrategyOptions, Strategy as LocalStrategy, VerifyFunction } from "passport-local";
 import { Strategy as JwtStrategy, ExtractJwt, VerifyCallback, StrategyOptions } from "passport-jwt";
 import { User } from "../models/User";
 import { verifyPassword } from "../utils/bcryption";
@@ -26,14 +26,14 @@ const verifyUserCredientials: VerifyFunction = async (username, password, done) 
     }
 };
 
-const localStrategy: Strategy = new LocalStrategy(localOpts, verifyUserCredientials);
+const localStrategy: LocalStrategy = new LocalStrategy(localOpts, verifyUserCredientials);
 
 const jwtOpts: StrategyOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRECT as string,
 }
 
-const verifyUserToken: VerifyCallback = async (payload, done) => {
+const verifyUserFromToken: VerifyCallback = async (payload, done) => {
     try {
         const user = await User.findById(payload._id);
 
@@ -45,7 +45,7 @@ const verifyUserToken: VerifyCallback = async (payload, done) => {
     }
 }
 
-const jwtStrategy: JwtStrategy = new JwtStrategy(jwtOpts, verifyUserToken);
+const jwtStrategy: JwtStrategy = new JwtStrategy(jwtOpts, verifyUserFromToken);
 
 passport.use(localStrategy);
 passport.use(jwtStrategy);
