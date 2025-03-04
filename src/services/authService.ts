@@ -28,7 +28,7 @@ export const loginUser: LoginUser["loginUser"] = async (userData) => {
     const user = await User.getUser(userData.email);
 
     if (!user) throw new Error("User is not existed");
-    console.log(userData.password);
+
     const checkPassword = await verifyPassword(
       userData.password,
       user.password
@@ -36,7 +36,7 @@ export const loginUser: LoginUser["loginUser"] = async (userData) => {
 
     if (!checkPassword) throw new Error("Password's not correct");
 
-    return "Logged in successfully!";
+    return user;
   } catch (error) {
     console.error(`error`);
 

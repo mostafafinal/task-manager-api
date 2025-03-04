@@ -10,5 +10,5 @@ interface ILoginData {
 }
 
 export interface LoginUser { 
-  loginUser(userData: ILoginData): Promise<string>;
+  loginUser(userData: ILoginData): Promise<IUser>;
 }
