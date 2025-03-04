@@ -1,8 +1,8 @@
 import * as authService from "../services/authService";
 import { IUser } from "../interfaces/schemas";
-import { SignUp } from "../interfaces/authController";
+import { RegularMiddleware } from "../interfaces/expressMiddleware";
 
-export const signUp: SignUp = async (
+export const signUp: RegularMiddleware = async (
   req,
   res,
   next
