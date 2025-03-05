@@ -42,6 +42,9 @@ describe("User Authentication Test", () => {
       password: user.password,
     });
 
-    expect(login).toBe("Logged in successfully!");
+    expect(login).toMatchObject<IUser>({
+      ...user,
+      password: createdUser.password,
+    });
   });
 });
