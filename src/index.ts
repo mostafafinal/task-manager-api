@@ -28,14 +28,14 @@ app.post("/user/register", authController.signUp);
 app.post(
   "/user/login",
   passport.authenticate("local", { session: false }),
-  signToken
+  signToken,
 );
 app.get(
   "/protected",
   passport.authenticate("jose", { session: false }),
   (req, res) => {
     res.json({ message: "authorized" });
-  }
+  },
 );
 
 // Error handling middleware
@@ -45,12 +45,12 @@ app.use(
     req: express.Request,
     res: express.Response,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    next: express.NextFunction
+    next: express.NextFunction,
   ) => {
     console.error(err.stack);
 
     res.status(500).json({ error: "Something broke!" });
-  }
+  },
 );
 
 mongoose

@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IUser, UserModel } from "../interfaces/schemas";
+import { IUser, UserModel } from "../types/schemas";
 
 const userSchema = new Schema<IUser, UserModel>({
   firstName: {
@@ -29,7 +29,7 @@ userSchema.static(
     if (user) return true;
 
     return false;
-  }
+  },
 );
 
 userSchema.static("getUser", async function getUser(userEmail) {

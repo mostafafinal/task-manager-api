@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { registerUser, loginUser } from "../../src/services/authService";
 import { closeDBForTesting, connectDBForTesting } from "../prePostTesting";
-import { IUser } from "../../src/interfaces/schemas";
+import { IUser } from "../../src/types/schemas";
 
 describe("User Authentication Test", () => {
   let user: IUser;

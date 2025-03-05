@@ -1,8 +1,8 @@
 import request from "supertest";
 import app from "../../src/index";
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker";
 import { closeDBForTesting } from "../prePostTesting";
-import { IUser } from "../../src/interfaces/schemas";
+import { IUser } from "../../src/types/schemas";
 import { User } from "../../src/models/User";
 
 describe("Auth Controller Test", () => {
@@ -12,7 +12,7 @@ describe("Auth Controller Test", () => {
     await User.collection.drop();
 
     await closeDBForTesting();
-  })
+  });
 
   beforeEach(() => {
     user = {
@@ -21,17 +21,20 @@ describe("Auth Controller Test", () => {
       email: faker.internet.email(),
       password: faker.internet.password(),
     };
-  })
+  });
 
   test("Register new user", async () => {
     const res = await request(app)
-      .post('/user/register')
+      .post("/user/register")
       .send({
-        ...user
-      })
+        ...user,
+      });
 
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.status).toBe("success");
-      expect(res.body.user).toMatchObject<IUser>({...user, password: res.body.user.password})
-  })
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toBe("success");
+    expect(res.body.user).toMatchObject<IUser>({
+      ...user,
+      password: res.body.user.password,
+    });
+  });
 });

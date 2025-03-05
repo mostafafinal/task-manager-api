@@ -1,5 +1,5 @@
 import { SignJWT } from "jose";
-import { RegularMiddleware } from "../interfaces/expressMiddleware";
+import { RegularMiddleware } from "../types/expressMiddleware";
 
 export const signToken: RegularMiddleware = async (req, res, next) => {
   try {

@@ -1,7 +1,7 @@
 import { connectDBForTesting, closeDBForTesting } from "../prePostTesting";
 import { User } from "../../src/models/User";
 import { faker } from "@faker-js/faker";
-import { IUser } from "../../src/interfaces/schemas";
+import { IUser } from "../../src/types/schemas";
 
 describe("User model testing", () => {
   let user: IUser;

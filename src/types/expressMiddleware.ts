@@ -13,5 +13,5 @@ declare global {
 export type RegularMiddleware = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => Promise<void>;

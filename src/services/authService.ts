@@ -1,4 +1,4 @@
-import { LoginUser, RegisterUser } from "../interfaces/authService";
+import { LoginUser, RegisterUser } from "../types/authService";
 import { User } from "../models/User";
 import { hashPassword, verifyPassword } from "../utils/bcryption";
 
@@ -31,7 +31,7 @@ export const loginUser: LoginUser["loginUser"] = async (userData) => {
 
     const checkPassword = await verifyPassword(
       userData.password,
-      user.password
+      user.password,
     );
 
     if (!checkPassword) throw new Error("Password's not correct");

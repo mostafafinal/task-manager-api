@@ -17,7 +17,7 @@ const localOpts: IStrategyOptions = {
 const verifyUserCredientials: VerifyFunction = async (
   username,
   password,
-  done
+  done,
 ) => {
   try {
     const user = await loginUser({ email: username, password: password });
@@ -34,7 +34,7 @@ const verifyUserCredientials: VerifyFunction = async (
 
 const localStrategy: LocalStrategy = new LocalStrategy(
   localOpts,
-  verifyUserCredientials
+  verifyUserCredientials,
 );
 
 const CustomStrategy = passportCustom.Strategy;

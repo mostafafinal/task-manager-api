@@ -6,9 +6,9 @@ export interface RegisterUser {
 
 interface ILoginData {
   email: string;
-  password: string
+  password: string;
 }
 
-export interface LoginUser { 
+export interface LoginUser {
   loginUser(userData: ILoginData): Promise<IUser>;
 }
