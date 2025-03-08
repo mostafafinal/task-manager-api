@@ -5,6 +5,7 @@ export interface IUser {
   lastName: string;
   email: string;
   password: string;
+  projects: ProjectModel;
 }
 
 export interface UserModel extends Model<IUser> {
