@@ -33,7 +33,7 @@ userSchema.static(
     if (user) return true;
 
     return false;
-  },
+  }
 );
 
 userSchema.static("getUser", async function getUser(userEmail) {

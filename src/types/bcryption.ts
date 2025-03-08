@@ -5,6 +5,6 @@ export interface HashPassword {
 export interface VerifyPassword {
   verifyPassword(
     orginalPassword: string,
-    hashedPassword: string,
+    hashedPassword: string
   ): Promise<boolean>;
 }

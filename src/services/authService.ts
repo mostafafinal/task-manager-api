@@ -31,7 +31,7 @@ export const loginUser: LoginUser["loginUser"] = async (userData) => {
 
     const checkPassword = await verifyPassword(
       userData.password,
-      user.password,
+      user.password
     );
 
     if (!checkPassword) throw new Error("Password's not correct");

@@ -17,13 +17,15 @@ const localOpts: IStrategyOptions = {
 const verifyUserCredientials: VerifyFunction = async (
   username,
   password,
-  done,
+  done
 ) => {
   try {
     const user = await loginUser({ email: username, password: password });
 
     if (!user) {
-      return done(null, false, { message: "Incorrect email or password" });
+      return done(null, false, {
+        message: "Incorrect email or password",
+      });
     }
 
     return done(null, user);
@@ -34,7 +36,7 @@ const verifyUserCredientials: VerifyFunction = async (
 
 const localStrategy: LocalStrategy = new LocalStrategy(
   localOpts,
-  verifyUserCredientials,
+  verifyUserCredientials
 );
 
 const CustomStrategy = passportCustom.Strategy;
