@@ -4,11 +4,17 @@ import {
   Strategy as LocalStrategy,
   VerifyFunction,
 } from "passport-local";
-import passportCustom, { VerifiedCallback } from "passport-custom";
+import {
+  Strategy as JwtStrategy,
+  ExtractJwt,
+  VerifyCallback,
+  StrategyOptionsWithoutRequest,
+} from "passport-jwt";
 import { loginUser } from "../services/authService";
-import { Request } from "express";
-import { jwtVerify } from "jose";
 import { User } from "../models/User";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const localOpts: IStrategyOptions = {
   usernameField: "email",
@@ -39,37 +45,24 @@ const localStrategy: LocalStrategy = new LocalStrategy(
   verifyUserCredientials
 );
 
-const CustomStrategy = passportCustom.Strategy;
-
-const getTokenFromHeader = (request: Request): string | null => {
-  const authHeader = request.headers.authorization;
-
-  if (authHeader && authHeader.startsWith("Bearer "))
-    return authHeader.split(" ")[1];
-
-  return null;
+const jwtOpts: StrategyOptionsWithoutRequest = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET as string,
 };
 
-const joseVerifyCallback: VerifiedCallback = async (request, done) => {
+const verifyUserFromToken: VerifyCallback = (payload, done) => {
   try {
-    const token = getTokenFromHeader(request);
-
-    if (!token) return done(new Error("Missing token"), false);
-
-    const secretKey = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jwtVerify(token, secretKey);
-
-    const user = await User.findOne({ email: payload.email });
+    const user = User.findOne({ email: payload.email });
 
     if (!user) return done(null, false);
 
     return done(null, user);
   } catch (error) {
-    return done(error);
+    return done(error, false);
   }
 };
 
-const JoseStrategy = new CustomStrategy(joseVerifyCallback);
+const jwtStrategy: JwtStrategy = new JwtStrategy(jwtOpts, verifyUserFromToken);
 
 passport.use(localStrategy);
-passport.use("jose", JoseStrategy);
+passport.use(jwtStrategy);

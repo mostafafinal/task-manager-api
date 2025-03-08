@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import * as authController from "./controllers/authController";
-import { signToken } from "./middlewares/jose";
+import { signToken } from "./middlewares/jwt";
 import passport from "passport";
 import "./configs/passport";
 
@@ -32,7 +32,7 @@ app.post(
 );
 app.get(
   "/protected",
-  passport.authenticate("jose", { session: false }),
+  passport.authenticate("jwt", { session: false }),
   (req, res) => {
     res.json({ message: "authorized" });
   }
