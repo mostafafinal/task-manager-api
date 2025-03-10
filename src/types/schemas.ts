@@ -1,11 +1,11 @@
-import { Model } from "mongoose";
+import { Document, Model, ObjectId } from "mongoose";
 
-export interface IUser {
+export interface IUser extends Document {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  projects: ProjectModel;
+  projects?: ObjectId[];
 }
 
 export interface UserModel extends Model<IUser> {
@@ -13,23 +13,21 @@ export interface UserModel extends Model<IUser> {
   getUser(email: string): Promise<IUser>;
 }
 
-export interface TaskModel {
+export interface TaskModel extends Document {
   name: string;
   status: string;
   deadline: Date;
   priority: string;
   description?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  projectId: ObjectId;
 }
 
-export interface ProjectModel {
+export interface ProjectModel extends Document {
   name: string;
   deadline: Date;
   status: string;
   priority: string;
   description?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  tasks: TaskModel;
+  userId: ObjectId;
+  tasks?: ObjectId[];
 }

@@ -10,10 +10,14 @@ const projectSchema = new Schema<ProjectModel>(
     status: {
       type: String,
       required: [true, "Project status is required"],
+      enum: ["active", "completed"],
+      default: "active",
     },
     priority: {
       type: String,
       required: [true, "The project should be priortized"],
+      enum: ["low", "moderate", "high"],
+      default: "moderate",
     },
     description: {
       type: String,
@@ -23,10 +27,13 @@ const projectSchema = new Schema<ProjectModel>(
       type: Date,
       required: [true, "The project should has a deadline"],
     },
-    tasks: {
-      type: Schema.Types.ObjectId,
-      ref: "Task",
-    },
+    userId: { type: Schema.Types.ObjectId },
+    tasks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Task",
+      },
+    ],
   },
   { timestamps: true }
 );

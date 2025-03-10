@@ -19,10 +19,12 @@ const userSchema = new Schema<IUser, UserModel>({
     type: String,
     required: [true, "password is required"],
   },
-  projects: {
-    type: Schema.Types.ObjectId,
-    ref: "Project",
-  },
+  projects: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Project",
+    },
+  ],
 });
 
 userSchema.static(
