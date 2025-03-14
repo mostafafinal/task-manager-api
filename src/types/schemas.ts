@@ -1,6 +1,6 @@
-import { Document, Model, Types } from "mongoose";
+import { Model, Types } from "mongoose";
 
-export interface IUser extends Document {
+export interface IUser {
   firstName: string;
   lastName: string;
   email: string;
@@ -13,7 +13,7 @@ export interface UserModel extends Model<IUser> {
   getUser(email: string): Promise<IUser>;
 }
 
-export interface TaskModel extends Document {
+export interface TaskModel {
   name: string;
   status: string;
   deadline: Date;
@@ -22,7 +22,7 @@ export interface TaskModel extends Document {
   projectId: Types.ObjectId;
 }
 
-export interface ProjectModel extends Document {
+export interface ProjectModel {
   name: string;
   deadline: Date;
   status: string;

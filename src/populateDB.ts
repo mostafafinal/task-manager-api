@@ -1,4 +1,4 @@
-import { connect, ObjectId } from "mongoose";
+import { connect, HydratedDocument, ObjectId } from "mongoose";
 import { faker } from "@faker-js/faker";
 import { User } from "./models/User";
 import { Project } from "./models/Project";
@@ -44,7 +44,7 @@ const fakeTaskData = async function* (
     if (!projectId) throw new Error("User id is not provided for tasks");
 
     for (let i = 0; i < tasksVolume; i++) {
-      const task: TaskModel = await Task.create({
+      const task: HydratedDocument<TaskModel> = await Task.create({
         name: faker.commerce.productName(),
         deadline: faker.date.soon(),
         status: faker.helpers.arrayElement([
@@ -75,7 +75,7 @@ const fakeProjectData = async function* (
     if (!userId) throw new Error("User id is not provided for projects");
 
     for (let i = 0; i < projectsVolume; i++) {
-      const project: ProjectModel = await Project.create({
+      const project: HydratedDocument<ProjectModel> = await Project.create({
         name: faker.commerce.productName(),
         deadline: faker.date.soon(),
         status: faker.helpers.arrayElement(["active", "completed"]),
@@ -107,7 +107,7 @@ const fakeUserData = async (
 ) => {
   try {
     for (let i = 0; i < usersVolume; i++) {
-      const user: IUser = await User.create({
+      const user: HydratedDocument<IUser> = await User.create({
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
         email: faker.internet.email(),

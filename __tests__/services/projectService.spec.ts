@@ -17,14 +17,14 @@ describe("project service testing", () => {
   const id: Types.ObjectId = new Types.ObjectId(
     faker.database.mongodbObjectId()
   );
-  const project = {
+  const project: ProjectModel = {
     name: faker.commerce.productName(),
     deadline: faker.date.soon(),
     status: faker.helpers.arrayElement(["active", "completed"]),
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
     userId: new Types.ObjectId(faker.database.mongodbObjectId()),
-  } as ProjectModel;
+  };
 
   test("create new project test", async () => {
     Project.create = jest.fn();
