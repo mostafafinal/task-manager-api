@@ -1,11 +1,8 @@
 import request from "supertest";
 import app from "../../src/index";
 import { faker } from "@faker-js/faker";
-// import { closeDBForTesting } from "../prePostTesting";
 import { IUser } from "../../src/types/schemas";
 import * as authService from "../../src/services/authService";
-
-// jest.mock("../../src/types/authService");
 
 describe("Auth Controller Test", () => {
   const user: IUser = {
