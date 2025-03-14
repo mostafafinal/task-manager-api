@@ -15,7 +15,7 @@ export const registerUser: RegisterUser["registerUser"] = async (userData) => {
       password: hashedPassword,
     });
 
-    return user.toObject();
+    return user;
   } catch (error) {
     console.error(error);
 
