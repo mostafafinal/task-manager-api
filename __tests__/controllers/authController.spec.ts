@@ -1,27 +1,23 @@
 import request from "supertest";
 import app from "../../src/index";
 import { faker } from "@faker-js/faker";
-import { closeDBForTesting } from "../prePostTesting";
+// import { closeDBForTesting } from "../prePostTesting";
 import { IUser } from "../../src/types/schemas";
-import { User } from "../../src/models/User";
+import * as authService from "../../src/services/authService";
+
+// jest.mock("../../src/types/authService");
 
 describe("Auth Controller Test", () => {
-  let user: IUser;
+  const user: IUser = {
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    email: faker.internet.email(),
+    password: faker.internet.password(),
+  };
 
-  afterAll(async () => {
-    await User.collection.drop();
+  jest.spyOn(authService, "registerUser").mockResolvedValue(user);
 
-    await closeDBForTesting();
-  });
-
-  beforeEach(() => {
-    user = {
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-    };
-  });
+  afterAll(() => jest.clearAllMocks());
 
   test("Register new user", async () => {
     const res = await request(app)
