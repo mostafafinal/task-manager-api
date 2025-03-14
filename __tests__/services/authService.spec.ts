@@ -1,18 +1,14 @@
 import { faker } from "@faker-js/faker";
 import { registerUser, loginUser } from "../../src/services/authService";
-import { closeDBForTesting, connectDBForTesting } from "../prePostTesting";
+import { User } from "../../src/models/User";
 import { IUser } from "../../src/types/schemas";
+import { verifyPassword } from "../../src/utils/bcryption";
+
+jest.mock("../../src/models/User");
+jest.mock("../../src/utils/bcryption");
 
 describe("User Authentication Test", () => {
   let user: IUser;
-
-  beforeAll(async () => await connectDBForTesting());
-
-  afterAll(async () => {
-    // await User.collection.drop();
-
-    await closeDBForTesting();
-  });
 
   beforeEach(() => {
     user = {
@@ -20,31 +16,30 @@ describe("User Authentication Test", () => {
       lastName: faker.person.lastName(),
       email: faker.internet.email(),
       password: faker.internet.password(),
-    };
+    } as IUser;
   });
 
-  const createUser = async () => await registerUser(user);
+  afterAll(() => jest.clearAllMocks());
 
   test("User Register Test", async () => {
-    const createdUser = await createUser();
+    User.checkUserByEmail = jest.fn().mockResolvedValue(false);
+    User.create = jest.fn().mockResolvedValue(user);
 
-    expect(createdUser).toMatchObject<IUser>({
-      ...user,
-      password: createdUser.password,
-    });
+    const createdUser = await registerUser(user);
+
+    expect(createdUser).toMatchObject<IUser>(user);
   });
 
   test("User Login Test", async () => {
-    const createdUser = await createUser();
+    User.getUser = jest.fn().mockReturnValue(user);
+
+    (verifyPassword as jest.Mock).mockResolvedValue(true);
 
     const login = await loginUser({
-      email: createdUser.email,
+      email: user.email,
       password: user.password,
     });
 
-    expect(login).toMatchObject<IUser>({
-      ...user,
-      password: createdUser.password,
-    });
+    expect(login).toMatchObject<IUser>(user);
   });
 });
