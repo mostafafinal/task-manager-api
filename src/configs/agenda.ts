@@ -10,7 +10,9 @@ const jobTypes: string[] = process.env.JOB_TYPES
   ? process.env.JOB_TYPES.split(",")
   : [];
 
-jobTypes.forEach((type) => import("./jobs/" + type).then((job) => job(agenda)));
+jobTypes.forEach((type) =>
+  import(`../jobs/${type}`).then((job) => job[type](agenda))
+);
 
 if (jobTypes.length) {
   agenda.start();
