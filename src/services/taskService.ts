@@ -2,21 +2,29 @@ import { Types } from "mongoose";
 import { Task } from "../models/Task";
 import { TaskModel } from "../types/schemas";
 
-export const createTask = async (taskData: TaskModel) => {
+export const createTask = async (
+  taskData: TaskModel
+): Promise<TaskModel | undefined> => {
   try {
     if (!taskData) throw new Error("Service: task data's not provided");
 
-    await Task.create(taskData);
+    const task: TaskModel = await Task.create(taskData);
+
+    return task;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const getTasks = async (projectId: Types.ObjectId) => {
+export const getTasks = async (
+  projectId: Types.ObjectId
+): Promise<TaskModel[] | undefined> => {
   try {
     if (!projectId) throw new Error("Service: user's id's not provided");
 
-    await Task.find({ projectId: projectId });
+    const tasks: TaskModel[] = await Task.find({ projectId: projectId });
+
+    return tasks;
   } catch (error) {
     console.error(error);
   }
