@@ -3,21 +3,29 @@ import { Project } from "../models/Project";
 import { ProjectModel } from "../types/schemas";
 import agenda from "../configs/agenda";
 
-export const createProject = async (projectData: ProjectModel) => {
+export const createProject = async (
+  projectData: ProjectModel
+): Promise<ProjectModel | undefined> => {
   try {
     if (!projectData) throw new Error("Service: project data's not provided");
 
-    await Project.create(projectData);
+    const project = await Project.create(projectData);
+
+    return project;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const getProjects = async (userId: Types.ObjectId) => {
+export const getProjects = async (
+  userId: Types.ObjectId
+): Promise<ProjectModel[] | undefined> => {
   try {
     if (!userId) throw new Error("Service: user's id's not provided");
 
-    await Project.find({ userId: userId });
+    const projects = await Project.find({ userId: userId });
+
+    return projects;
   } catch (error) {
     console.error(error);
   }
