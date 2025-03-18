@@ -4,6 +4,7 @@ import { User } from "./models/User";
 import { Project } from "./models/Project";
 import { Task } from "./models/Task";
 import { IUser, ProjectModel, TaskModel } from "./types/schemas";
+import { hashPassword } from "./utils/bcryption";
 
 const uri = process.env.MONGO_URL as string;
 
@@ -111,7 +112,7 @@ const fakeUserData = async (
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
         email: faker.internet.email(),
-        password: "12345678",
+        password: await hashPassword("12345678"),
       });
 
       for await (const projectId of fakeProjectData(
