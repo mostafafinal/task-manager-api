@@ -50,9 +50,9 @@ const jwtOpts: StrategyOptionsWithoutRequest = {
   secretOrKey: process.env.JWT_SECRET as string,
 };
 
-const verifyUserFromToken: VerifyCallback = (payload, done) => {
+const verifyUserFromToken: VerifyCallback = async (payload, done) => {
   try {
-    const user = User.findOne({ email: payload.email });
+    const user = await User.findOne({ _id: payload.id });
 
     if (!user) return done(null, false);
 

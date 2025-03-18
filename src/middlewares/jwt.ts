@@ -6,7 +6,7 @@ export const signToken: RegularMiddleware = async (req, res, next) => {
     if (!req.user) throw new Error("user data're not found");
 
     const payload: JwtPayload = {
-      email: req.user?.email as string,
+      id: req.user.id as string,
     };
 
     const secret = process.env.JWT_SECRET as string;
