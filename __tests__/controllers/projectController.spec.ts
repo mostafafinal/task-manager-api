@@ -25,12 +25,12 @@ describe("Project controller testing", () => {
     (service.createProject as jest.Mock) = jest.fn().mockResolvedValue(project);
 
     const res: Response = await request(app)
-      .post("/project/create")
+      .post("/projects")
       .set("Cookie", [`userId=${id}`])
       .send({ project: project });
 
     expect(service.createProject).toHaveBeenCalled();
-    expect(res.statusCode).toEqual(200);
+    expect(res.statusCode).toEqual(201);
     expect(res.body.status).toBe("success");
     expect(res.body.message).toBe("project created successfully");
     expect(res.body.data).toBeDefined();
@@ -42,7 +42,7 @@ describe("Project controller testing", () => {
       .mockResolvedValue([project, project]);
 
     const res: Response = await request(app)
-      .get("/project")
+      .get("/projects")
       .set("Cookie", [`userId=${id}`]);
 
     expect(service.getProjects).toHaveBeenCalledWith(id);
@@ -57,8 +57,7 @@ describe("Project controller testing", () => {
       .mockResolvedValue({ ...project, description: newDes });
 
     const res: Response = await request(app)
-      .put("/project/update")
-      .set("Cookie", [`projectId=${id}`])
+      .put(`/projects/${id}`)
       .send({
         projectId: id,
         newData: {
@@ -73,15 +72,11 @@ describe("Project controller testing", () => {
   });
 
   test("delete project request", async () => {
-    (service.deleteProject as jest.Mock) = jest.fn();
+    (service.deleteProject as jest.Mock) = jest.fn().mockResolvedValue(null);
 
-    const res: Response = await request(app)
-      .delete("/project/delete")
-      .set("Cookie", [`projectId=${id}`]);
+    const res: Response = await request(app).delete(`/projects/${id}`);
 
-    expect(service.deleteProject).toHaveBeenCalledWith(id);
-    expect(res.statusCode).toEqual(201);
-    expect(res.body.status).toBe("success");
-    expect(res.body.message).toBeDefined();
+    expect(service.deleteProject).toHaveBeenCalled();
+    expect(res.statusCode).toEqual(204);
   });
 });

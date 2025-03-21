@@ -14,7 +14,7 @@ export const createProjectPost: RegularMiddleware = async (req, res, next) => {
     const createdProject: ProjectModel | undefined =
       await service.createProject(project);
 
-    res.json({
+    res.status(201).json({
       status: "success",
       message: "project created successfully",
       data: createdProject,
@@ -48,14 +48,14 @@ export const getProjects: RegularMiddleware = async (req, res, next) => {
 export const updateProjectPost: RegularMiddleware = async (req, res, next) => {
   try {
     const { newData } = req.body;
-    const projectId = ObjectId.createFromHexString(req.cookies.projectId);
+    const projectId = ObjectId.createFromHexString(req.params.id);
 
     if (!newData) throw new Error("project data's not provided");
     if (!projectId) throw new Error("user credentials are not existed");
 
     await service.updateProject(projectId, newData);
 
-    res.json({
+    res.status(200).json({
       status: "success",
       message: "project updated successfully",
     });
@@ -69,13 +69,13 @@ export const updateProjectPost: RegularMiddleware = async (req, res, next) => {
 
 export const deleteProjectPost: RegularMiddleware = async (req, res, next) => {
   try {
-    const projectId = ObjectId.createFromHexString(req.cookies.projectId);
+    const projectId = ObjectId.createFromHexString(req.params.id);
 
     if (!projectId) throw new Error("user credentials are not existed");
 
     await service.deleteProject(projectId);
 
-    res.status(201).json({
+    res.status(204).json({
       status: "success",
       message: "project deleted successfully",
     });
