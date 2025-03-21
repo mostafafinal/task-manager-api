@@ -18,12 +18,12 @@ describe("Auth Controller Test", () => {
 
   test("Register new user", async () => {
     const res = await request(app)
-      .post("/user/register")
+      .post("/auth/register")
       .send({
         ...user,
       });
 
-    expect(res.statusCode).toEqual(200);
+    expect(res.statusCode).toEqual(201);
     expect(res.body.status).toBe("success");
     expect(res.body.user).toMatchObject<IUser>({
       ...user,
