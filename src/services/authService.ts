@@ -1,8 +1,10 @@
-import { LoginUser, RegisterUser } from "../types/authService";
 import { User } from "../models/User";
 import { hashPassword, verifyPassword } from "../utils/bcryption";
+import { IUser } from "../types/schemas";
 
-export const registerUser: RegisterUser["registerUser"] = async (userData) => {
+type RegisterUser = (data: IUser) => Promise<IUser | undefined>;
+
+export const registerUser: RegisterUser = async (userData) => {
   try {
     const isExisted = await User.checkUserByEmail(userData.email);
 
@@ -18,19 +20,19 @@ export const registerUser: RegisterUser["registerUser"] = async (userData) => {
     return user;
   } catch (error) {
     console.error(error);
-
-    throw error;
   }
 };
 
-export const loginUser: LoginUser["loginUser"] = async (userData) => {
+type LoginUser = (data: Partial<IUser>) => Promise<IUser | undefined>;
+
+export const loginUser: LoginUser = async (userData) => {
   try {
-    const user = await User.getUser(userData.email);
+    const user = await User.getUser(userData.email as string);
 
     if (!user) throw new Error("User is not existed");
 
     const checkPassword = await verifyPassword(
-      userData.password,
+      userData.password as string,
       user.password
     );
 
@@ -38,8 +40,6 @@ export const loginUser: LoginUser["loginUser"] = async (userData) => {
 
     return user;
   } catch (error) {
-    console.error(`error`);
-
-    throw error;
+    console.error(error);
   }
 };
