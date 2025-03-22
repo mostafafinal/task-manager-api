@@ -16,20 +16,6 @@ export const createTask = async (
   }
 };
 
-export const getTasks = async (
-  projectId: Types.ObjectId
-): Promise<TaskModel[] | undefined> => {
-  try {
-    if (!projectId) throw new Error("Service: user's id's not provided");
-
-    const tasks: TaskModel[] = await Task.find({ projectId: projectId });
-
-    return tasks;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 export const updateTask = async (
   taskId: Types.ObjectId,
   updates: Partial<TaskModel>

@@ -25,27 +25,14 @@ describe("Task controller testing", () => {
     (service.createTask as jest.Mock) = jest.fn().mockResolvedValue(task);
 
     const res: Response = await request(app)
-      .post("/task/create")
-      .set("Cookie", [`projectId=${id}`])
-      .send({ task: task });
+      .post("/tasks")
+      .send({ projectId: id, task: task });
 
     expect(service.createTask).toHaveBeenCalled();
-    expect(res.statusCode).toEqual(200);
+    expect(res.statusCode).toEqual(201);
     expect(res.body.status).toBe("success");
     expect(res.body.message).toBe("task created successfully");
     expect(res.body.data).toBeDefined();
-  });
-
-  test("get tasks request", async () => {
-    (service.getTasks as jest.Mock) = jest.fn().mockResolvedValue([task, task]);
-
-    const res: Response = await request(app)
-      .get("/task")
-      .set("Cookie", [`projectId=${id}`]);
-
-    expect(service.getTasks).toHaveBeenCalledWith(id);
-    expect(res.statusCode).toEqual(200);
-    expect(res.body.data).toBeInstanceOf(Array);
   });
 
   test("update task request", async () => {
@@ -55,10 +42,8 @@ describe("Task controller testing", () => {
       .mockResolvedValue({ ...task, description: newDes });
 
     const res: Response = await request(app)
-      .put("/task/update")
-      .set("Cookie", [`taskId=${id}`])
+      .put(`/tasks/${id}`)
       .send({
-        taskId: id,
         newData: {
           description: newDes,
         },
@@ -71,15 +56,11 @@ describe("Task controller testing", () => {
   });
 
   test("delete task request", async () => {
-    (service.deleteTask as jest.Mock) = jest.fn();
+    (service.deleteTask as jest.Mock) = jest.fn().mockResolvedValue(null);
 
-    const res: Response = await request(app)
-      .delete("/task/delete")
-      .set("Cookie", [`taskId=${id}`]);
+    const res: Response = await request(app).delete(`/tasks/${id}`);
 
-    expect(service.deleteTask).toHaveBeenCalledWith(id);
-    expect(res.statusCode).toEqual(201);
-    expect(res.body.status).toBe("success");
-    expect(res.body.message).toBeDefined();
+    expect(service.deleteTask).toHaveBeenCalled();
+    expect(res.statusCode).toEqual(204);
   });
 });

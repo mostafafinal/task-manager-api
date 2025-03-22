@@ -1,7 +1,6 @@
 import {
   createTask,
   deleteTask,
-  getTasks,
   updateTask,
 } from "../../src/services/taskService";
 import { Task } from "../../src/models/Task";
@@ -30,14 +29,6 @@ describe("task service testing", () => {
     await createTask(task);
 
     expect(Task.create).toHaveBeenCalledWith(task);
-  });
-
-  test("get all tasks test", async () => {
-    Task.find = jest.fn();
-
-    await getTasks(id);
-
-    expect(Task.find).toHaveBeenCalledWith({ projectId: id });
   });
 
   test("update task test", async () => {

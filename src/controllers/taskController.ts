@@ -5,15 +5,14 @@ import { TaskModel } from "../types/schemas";
 
 export const createTaskPost: RegularMiddleware = async (req, res, next) => {
   try {
-    const { task } = req.body;
-    const { projectId } = req.cookies;
+    const { projectId, task } = req.body;
 
     if (!task) throw new Error("task data's not provided");
     if (!projectId) throw new Error("project credentials are not existed");
 
     const createdTask: TaskModel | undefined = await service.createTask(task);
 
-    res.json({
+    res.status(201).json({
       status: "success",
       message: "task created successfully",
       data: createdTask,
@@ -26,34 +25,17 @@ export const createTaskPost: RegularMiddleware = async (req, res, next) => {
   }
 };
 
-export const getTasks: RegularMiddleware = async (req, res, next) => {
-  try {
-    const projectId = ObjectId.createFromHexString(req.cookies.projectId);
-
-    if (!projectId) throw new Error("project credentials are not existed");
-
-    const tasks: TaskModel[] | undefined = await service.getTasks(projectId);
-
-    res.status(200).json({
-      data: tasks,
-    });
-  } catch (error) {
-    console.error(error);
-    next(error);
-  }
-};
-
 export const updateTaskPost: RegularMiddleware = async (req, res, next) => {
   try {
     const { newData } = req.body;
-    const taskId = ObjectId.createFromHexString(req.cookies.taskId);
+    const taskId = ObjectId.createFromHexString(req.params.id);
 
     if (!newData) throw new Error("task data's not provided");
     if (!taskId) throw new Error("project credentials are not existed");
 
     await service.updateTask(taskId, newData);
 
-    res.json({
+    res.status(200).json({
       status: "success",
       message: "task updated successfully",
     });
@@ -67,13 +49,12 @@ export const updateTaskPost: RegularMiddleware = async (req, res, next) => {
 
 export const deleteTaskPost: RegularMiddleware = async (req, res, next) => {
   try {
-    const taskId = ObjectId.createFromHexString(req.cookies.taskId);
-
+    const taskId = ObjectId.createFromHexString(req.params.id);
     if (!taskId) throw new Error("task credentials are not existed");
 
     await service.deleteTask(taskId);
 
-    res.status(201).json({
+    res.status(204).json({
       status: "success",
       message: "task deleted successfully",
     });
