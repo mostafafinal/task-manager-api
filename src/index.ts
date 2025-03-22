@@ -1,10 +1,11 @@
 import express, { urlencoded } from "express";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import * as authController from "./controllers/authController";
-import { signToken } from "./middlewares/jwt";
-import passport from "passport";
+import authRouter from "./routes/authRouter";
+import projectRouter from "./routes/projectRouter";
+import taskRouter from "./routes/taskRouter";
 import "./configs/passport";
 
 dotenv.config();
@@ -17,26 +18,17 @@ const DB = process.env.MONGO_URL as string;
 app.use(cors());
 app.use(express.json());
 
+app.use(cookieParser());
 app.use(urlencoded({ extended: false }));
 
 // Root endpoint
 app.get("/", (req, res) => {
-  res.json({ message: "Hello World!" });
+  res.send("Hello World!");
 });
 
-app.post("/user/register", authController.signUp);
-app.post(
-  "/user/login",
-  passport.authenticate("local", { session: false }),
-  signToken
-);
-app.get(
-  "/protected",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    res.json({ message: "authorized" });
-  }
-);
+app.use("/auth", authRouter);
+app.use("/projects", projectRouter);
+app.use("/tasks", taskRouter);
 
 // Error handling middleware
 app.use(
