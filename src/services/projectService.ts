@@ -31,6 +31,22 @@ export const getProjects = async (
   }
 };
 
+export const getProject = async (
+  projectId: Types.ObjectId
+): Promise<ProjectModel | undefined> => {
+  try {
+    if (!projectId) throw new Error("project id is not provided");
+
+    const task: ProjectModel | null = await Project.findById(projectId);
+
+    if (!task) throw Error("project not found");
+
+    return task;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const updateProject = async (
   projectId: Types.ObjectId,
   updates: Partial<ProjectModel>

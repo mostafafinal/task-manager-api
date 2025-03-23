@@ -2,6 +2,22 @@ import { Types } from "mongoose";
 import { Task } from "../models/Task";
 import { TaskModel } from "../types/schemas";
 
+export const getTask = async (
+  taskId: Types.ObjectId
+): Promise<TaskModel | undefined> => {
+  try {
+    if (!taskId) throw new Error("task id is not provided");
+
+    const task: TaskModel | null = await Task.findById(taskId);
+
+    if (!task) throw Error("task not found");
+
+    return task;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const createTask = async (
   taskData: TaskModel
 ): Promise<TaskModel | undefined> => {
