@@ -2,6 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "tsx watch src/index.ts",
     "build": "echo No need to build, tsx runs typescript",
