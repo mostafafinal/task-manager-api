@@ -50,6 +50,16 @@ describe("Project controller testing", () => {
     expect(res.body.data).toBeDefined();
   });
 
+  test("get project by id request", async () => {
+    (service.getProject as jest.Mock) = jest.fn().mockResolvedValue(project);
+
+    const res: Response = await request(app).get(`/projects/${id}`);
+
+    expect(service.getProject).toHaveBeenCalledWith(id);
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.data).toBeDefined();
+  });
+
   test("update project request", async () => {
     const newDes = faker.commerce.productDescription();
     (service.updateProject as jest.Mock) = jest

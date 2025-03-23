@@ -35,6 +35,16 @@ describe("Task controller testing", () => {
     expect(res.body.data).toBeDefined();
   });
 
+  test("get task by id request", async () => {
+    (service.getTask as jest.Mock) = jest.fn().mockResolvedValue(task);
+
+    const res: Response = await request(app).get(`/tasks/${id}`);
+
+    expect(service.getTask).toHaveBeenCalledWith(id);
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.data).toBeDefined();
+  });
+
   test("update task request", async () => {
     const newDes = faker.commerce.productDescription();
     (service.updateTask as jest.Mock) = jest
