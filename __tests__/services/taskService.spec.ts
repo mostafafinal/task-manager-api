@@ -1,6 +1,7 @@
 import {
   createTask,
   deleteTask,
+  getTask,
   updateTask,
 } from "../../src/services/taskService";
 import { Task } from "../../src/models/Task";
@@ -29,6 +30,15 @@ describe("task service testing", () => {
     await createTask(task);
 
     expect(Task.create).toHaveBeenCalledWith(task);
+  });
+
+  test("get task data", async () => {
+    Task.findById = jest.fn().mockResolvedValue(task);
+
+    const taskGet: TaskModel | undefined = await getTask(id);
+
+    expect(Task.findById).toHaveBeenLastCalledWith(id);
+    expect(taskGet).toMatchObject<TaskModel>(task);
   });
 
   test("update task test", async () => {

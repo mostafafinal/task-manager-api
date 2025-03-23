@@ -1,6 +1,7 @@
 import {
   createProject,
   deleteProject,
+  getProject,
   getProjects,
   updateProject,
 } from "../../src/services/projectService";
@@ -40,6 +41,15 @@ describe("project service testing", () => {
     await getProjects(id);
 
     expect(Project.find).toHaveBeenCalledWith({ userId: id });
+  });
+
+  test("get project data", async () => {
+    Project.findById = jest.fn().mockResolvedValue(project);
+
+    const projectGet: ProjectModel | undefined = await getProject(id);
+
+    expect(Project.findById).toHaveBeenLastCalledWith(id);
+    expect(projectGet).toMatchObject<ProjectModel>(project);
   });
 
   test("update project test", async () => {
