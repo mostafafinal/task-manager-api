@@ -25,6 +25,24 @@ export const createTaskPost: RegularMiddleware = async (req, res, next) => {
   }
 };
 
+export const getTaskGet: RegularMiddleware = async (req, res, next) => {
+  try {
+    if (!req.params.id) throw new Error("task id is not existed");
+
+    const taskId = ObjectId.createFromHexString(req.params.id);
+
+    const task: TaskModel | undefined = await service.getTask(taskId);
+
+    if (!task)
+      res.status(404).json({ status: "fail", message: "task not found!" });
+
+    res.status(200).json({ data: task });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 export const updateTaskPost: RegularMiddleware = async (req, res, next) => {
   try {
     const { newData } = req.body;

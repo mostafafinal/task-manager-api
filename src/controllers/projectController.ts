@@ -45,6 +45,25 @@ export const getProjects: RegularMiddleware = async (req, res, next) => {
   }
 };
 
+export const getProject: RegularMiddleware = async (req, res, next) => {
+  try {
+    if (!req.params.id) throw new Error("task id is not existed");
+
+    const projectId = ObjectId.createFromHexString(req.params.id);
+
+    const project: ProjectModel | undefined =
+      await service.getProject(projectId);
+
+    if (!project)
+      res.status(404).json({ status: "fail", message: "project not found!" });
+
+    res.status(200).json({ data: project });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 export const updateProjectPost: RegularMiddleware = async (req, res, next) => {
   try {
     const { newData } = req.body;
