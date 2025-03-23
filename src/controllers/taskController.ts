@@ -49,7 +49,7 @@ export const updateTaskPost: RegularMiddleware = async (req, res, next) => {
     const taskId = ObjectId.createFromHexString(req.params.id);
 
     if (!newData) throw new Error("task data's not provided");
-    if (!taskId) throw new Error("project credentials are not existed");
+    if (!taskId) throw new Error("task credentials are not existed");
 
     await service.updateTask(taskId, newData);
 
@@ -79,7 +79,7 @@ export const deleteTaskPost: RegularMiddleware = async (req, res, next) => {
   } catch (error) {
     console.error(error);
 
-    res.json({ status: "fail", message: "failed to delete project" });
+    res.json({ status: "fail", message: "failed to delete task" });
     next(error);
   }
 };
