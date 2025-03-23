@@ -14,6 +14,8 @@ projectRouter.use(
 
 projectRouter.get("/", projectController.getProjects);
 
+projectRouter.get("/:id", projectController.getProject);
+
 projectRouter.post("/", projectController.createProjectPost);
 
 projectRouter.put("/:id", projectController.updateProjectPost);
