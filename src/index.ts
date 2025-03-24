@@ -7,6 +7,7 @@ import authRouter from "./routes/authRouter";
 import projectRouter from "./routes/projectRouter";
 import taskRouter from "./routes/taskRouter";
 import "./configs/passport";
+import userRouter from "./routes/userRouter";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/user", userRouter);
 app.use("/projects", projectRouter);
 app.use("/tasks", taskRouter);
 
