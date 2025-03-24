@@ -42,11 +42,13 @@ export const getProject = async (
   try {
     if (!projectId) throw new Error("project id is not provided");
 
-    const task: ProjectModel | null = await Project.findById(projectId);
+    const project: ProjectModel | null = await Project.findById(
+      projectId
+    ).populate("tasks", ["name", "priority", "deadline", "status"]);
 
-    if (!task) throw Error("project not found");
+    if (!project) throw Error("project not found");
 
-    return task;
+    return project;
   } catch (error) {
     console.log(error);
   }
