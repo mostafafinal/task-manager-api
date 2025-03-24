@@ -25,10 +25,6 @@ export const signToken: RegularMiddleware = async (req, res, next) => {
       maxAge: 1000 * 60 * 60 * 24 * 3,
       httpOnly: true,
     });
-    res.cookie("userId", payload.id, {
-      maxAge: 1000 * 60 * 60 * 24 * 3,
-      httpOnly: true,
-    });
 
     res.json({ status: "success", message: "successfully logged" });
   } catch (err) {
