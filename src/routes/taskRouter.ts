@@ -1,16 +1,10 @@
 import { Router } from "express";
 import * as taskController from "../controllers/taskController";
-import passport from "passport";
+import isAuth from "../middlewares/isAuth";
 
 const taskRouter: Router = Router();
 
-taskRouter.use(
-  (req, res, next) => {
-    req.headers.authorization = "Bearer " + req.cookies["x-auth-token"];
-    next();
-  },
-  passport.authenticate("jwt", { session: false })
-);
+taskRouter.use(isAuth);
 
 taskRouter.post("/", taskController.createTaskPost);
 

@@ -1,16 +1,10 @@
 import { Router } from "express";
 import * as projectController from "../controllers/projectController";
-import passport from "passport";
+import isAuth from "../middlewares/isAuth";
 
 const projectRouter: Router = Router();
 
-projectRouter.use(
-  (req, res, next) => {
-    req.headers.authorization = "Bearer " + req.cookies["x-auth-token"];
-    next();
-  },
-  passport.authenticate("jwt", { session: false })
-);
+projectRouter.use(isAuth);
 
 projectRouter.get("/", projectController.getProjects);
 
