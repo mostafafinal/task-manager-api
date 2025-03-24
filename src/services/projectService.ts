@@ -23,7 +23,12 @@ export const getProjects = async (
   try {
     if (!userId) throw new Error("Service: user's id's not provided");
 
-    const projects = await Project.find({ userId: userId });
+    const projects = await Project.find({ userId: userId }).select([
+      "name",
+      "deadline",
+      "priority",
+      "status",
+    ]);
 
     return projects;
   } catch (error) {
