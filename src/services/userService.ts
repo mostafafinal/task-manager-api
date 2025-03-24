@@ -8,7 +8,9 @@ export const getUserById = async (
   try {
     if (!userId) throw Error("service: user id's not provided");
 
-    const user: Partial<IUser> | null = await User.findById({ id: userId });
+    const user: Partial<IUser> | null = await User.findById({
+      _id: userId,
+    }).select(["firstName", "lastName", "email"]);
 
     if (!user) throw Error("service: user's not found");
 
