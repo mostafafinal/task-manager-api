@@ -2,17 +2,28 @@ import * as service from "../services/projectService";
 import { RegularMiddleware } from "../types/expressMiddleware";
 import { ObjectId } from "mongodb";
 import { ProjectModel } from "../types/schemas";
+import { Types } from "mongoose";
 
 export const createProjectPost: RegularMiddleware = async (req, res, next) => {
   try {
-    const { project } = req.body;
-    const userId = req.user?.id;
+    const userId: Types.ObjectId = req.user?.id;
 
-    if (!project) throw new Error("project data's not provided");
     if (!userId) throw new Error("user credentials are not existed");
+
+    const project: ProjectModel = {
+      name: req.body.name,
+      priority: req.body.priority,
+      status: req.body.status,
+      deadline: req.body.deadline,
+      description: req.body.description,
+      userId: userId,
+    };
 
     const createdProject: ProjectModel | undefined =
       await service.createProject(project);
+
+    if (!createdProject)
+      res.status(404).json({ status: "fail", message: "project not created" });
 
     res.status(201).json({
       status: "success",
@@ -21,8 +32,6 @@ export const createProjectPost: RegularMiddleware = async (req, res, next) => {
     });
   } catch (error) {
     console.error(error);
-
-    res.json({ status: "fail", message: "failed to create project" });
     next(error);
   }
 };

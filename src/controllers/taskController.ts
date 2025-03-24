@@ -5,12 +5,19 @@ import { TaskModel } from "../types/schemas";
 
 export const createTaskPost: RegularMiddleware = async (req, res, next) => {
   try {
-    const { projectId, task } = req.body;
-
-    if (!task) throw new Error("task data's not provided");
-    if (!projectId) throw new Error("project credentials are not existed");
+    const task: TaskModel = {
+      name: req.body.name,
+      priority: req.body.priority,
+      status: req.body.status,
+      deadline: req.body.deadline,
+      description: req.body.description,
+      projectId: req.body.projectId,
+    };
 
     const createdTask: TaskModel | undefined = await service.createTask(task);
+
+    if (!createdTask)
+      res.status(404).json({ status: "fail", message: "task not created" });
 
     res.status(201).json({
       status: "success",
@@ -19,8 +26,6 @@ export const createTaskPost: RegularMiddleware = async (req, res, next) => {
     });
   } catch (error) {
     console.error(error);
-
-    res.json({ status: "fail", message: "failed to create task" });
     next(error);
   }
 };
