@@ -6,7 +6,7 @@ import { ProjectModel } from "../types/schemas";
 export const createProjectPost: RegularMiddleware = async (req, res, next) => {
   try {
     const { project } = req.body;
-    const { userId } = req.cookies;
+    const userId = req.user?.id;
 
     if (!project) throw new Error("project data's not provided");
     if (!userId) throw new Error("user credentials are not existed");
@@ -29,7 +29,7 @@ export const createProjectPost: RegularMiddleware = async (req, res, next) => {
 
 export const getProjects: RegularMiddleware = async (req, res, next) => {
   try {
-    const userId = ObjectId.createFromHexString(req.cookies.userId);
+    const userId = ObjectId.createFromHexString(req.user?.id);
 
     if (!userId) throw new Error("user credentials are not existed");
 
