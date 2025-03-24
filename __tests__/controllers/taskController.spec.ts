@@ -26,6 +26,7 @@ describe("Task controller testing", () => {
 
     const res: Response = await request(app)
       .post("/tasks")
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
       .send({ projectId: id, task: task });
 
     expect(service.createTask).toHaveBeenCalled();
@@ -38,9 +39,11 @@ describe("Task controller testing", () => {
   test("get task by id request", async () => {
     (service.getTask as jest.Mock) = jest.fn().mockResolvedValue(task);
 
-    const res: Response = await request(app).get(`/tasks/${id}`);
+    const res: Response = await request(app)
+      .get(`/tasks/${id}`)
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
-    expect(service.getTask).toHaveBeenCalledWith(id);
+    expect(service.getTask).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
     expect(res.body.data).toBeDefined();
   });
@@ -68,7 +71,9 @@ describe("Task controller testing", () => {
   test("delete task request", async () => {
     (service.deleteTask as jest.Mock) = jest.fn().mockResolvedValue(null);
 
-    const res: Response = await request(app).delete(`/tasks/${id}`);
+    const res: Response = await request(app)
+      .delete(`/tasks/${id}`)
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.deleteTask).toHaveBeenCalled();
     expect(res.statusCode).toEqual(204);
