@@ -26,8 +26,8 @@ describe("Project controller testing", () => {
 
     const res: Response = await request(app)
       .post("/projects")
-      .set("Cookie", [`userId=${id}`])
-      .send({ project: project });
+      .send({ project: project })
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.createProject).toHaveBeenCalled();
     expect(res.statusCode).toEqual(201);
@@ -43,9 +43,9 @@ describe("Project controller testing", () => {
 
     const res: Response = await request(app)
       .get("/projects")
-      .set("Cookie", [`userId=${id}`]);
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
-    expect(service.getProjects).toHaveBeenCalledWith(id);
+    expect(service.getProjects).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
     expect(res.body.data).toBeDefined();
   });
@@ -53,7 +53,9 @@ describe("Project controller testing", () => {
   test("get project by id request", async () => {
     (service.getProject as jest.Mock) = jest.fn().mockResolvedValue(project);
 
-    const res: Response = await request(app).get(`/projects/${id}`);
+    const res: Response = await request(app)
+      .get(`/projects/${id}`)
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.getProject).toHaveBeenCalledWith(id);
     expect(res.statusCode).toEqual(200);
@@ -68,6 +70,7 @@ describe("Project controller testing", () => {
 
     const res: Response = await request(app)
       .put(`/projects/${id}`)
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
       .send({
         projectId: id,
         newData: {
@@ -84,7 +87,9 @@ describe("Project controller testing", () => {
   test("delete project request", async () => {
     (service.deleteProject as jest.Mock) = jest.fn().mockResolvedValue(null);
 
-    const res: Response = await request(app).delete(`/projects/${id}`);
+    const res: Response = await request(app)
+      .delete(`/projects/${id}`)
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.deleteProject).toHaveBeenCalled();
     expect(res.statusCode).toEqual(204);
