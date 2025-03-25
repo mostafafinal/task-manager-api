@@ -24,6 +24,9 @@ export const signToken: RegularMiddleware = async (req, res, next) => {
     res.cookie("x-auth-token", token, {
       maxAge: 1000 * 60 * 60 * 24 * 3,
       httpOnly: true,
+      sameSite: "none",
+      secure: true,
+      partitioned: true,
     });
 
     res.json({ status: "success", message: "successfully logged" });
