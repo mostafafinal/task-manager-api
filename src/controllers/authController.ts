@@ -5,6 +5,7 @@ import { signToken } from "../middlewares/jwt";
 import { IUser } from "../types/schemas";
 import { NextFunction, Request, Response } from "express";
 import { HydratedDocument } from "mongoose";
+import isAuth from "../middlewares/isAuth";
 
 export const signUp: RegularMiddleware = async (req, res, next) => {
   try {
@@ -59,4 +60,21 @@ export const loginGoogleCB: RegularMiddleware[] = [
     session: false,
   }),
   signToken,
+];
+
+export const logout: [RegularMiddleware[], RegularMiddleware] = [
+  isAuth,
+  async (req, res, next) => {
+    try {
+      req.user = {} as HydratedDocument<IUser>;
+
+      res
+        .status(204)
+        .clearCookie("x-auth-token", { maxAge: 0, sameSite: "strict" })
+        .end();
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  },
 ];
