@@ -11,4 +11,6 @@ authRouter.get("/google", authController.loginGoogle);
 
 authRouter.get("/google/callback", authController.loginGoogleCB);
 
+authRouter.delete("/logout", ...authController.logout);
+
 export default authRouter;
