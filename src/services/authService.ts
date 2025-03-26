@@ -2,7 +2,7 @@ import { User } from "../models/User";
 import { hashPassword, verifyPassword } from "../utils/bcryption";
 import { IUser } from "../types/schemas";
 
-type RegisterUser = (data: IUser) => Promise<IUser | undefined>;
+type RegisterUser = (data: IUser) => Promise<void | undefined>;
 
 export const registerUser: RegisterUser = async (userData) => {
   try {
@@ -12,12 +12,10 @@ export const registerUser: RegisterUser = async (userData) => {
 
     const hashedPassword = await hashPassword(userData.password);
 
-    const user = await User.create({
+    await User.create({
       ...userData,
       password: hashedPassword,
     });
-
-    return user;
   } catch (error) {
     console.error(error);
   }

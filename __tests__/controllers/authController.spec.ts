@@ -12,7 +12,7 @@ describe("authentication controller suite", () => {
     password: faker.internet.password(),
   };
 
-  jest.spyOn(authService, "registerUser").mockResolvedValue(user);
+  jest.spyOn(authService, "registerUser");
 
   afterAll(() => jest.clearAllMocks());
 
@@ -23,12 +23,9 @@ describe("authentication controller suite", () => {
         ...user,
       });
 
+    expect(authService.registerUser).toHaveBeenCalledWith(user);
     expect(res.statusCode).toEqual(201);
     expect(res.body.status).toBe("success");
-    expect(res.body.user).toMatchObject<IUser>({
-      ...user,
-      password: res.body.user.password,
-    });
   });
 
   test("logout request", async () => {

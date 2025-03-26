@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { registerUser, loginUser } from "../../src/services/authService";
 import { User } from "../../src/models/User";
 import { IUser } from "../../src/types/schemas";
-import { verifyPassword } from "../../src/utils/bcryption";
+import { hashPassword, verifyPassword } from "../../src/utils/bcryption";
 
 jest.mock("../../src/models/User");
 jest.mock("../../src/utils/bcryption");
@@ -23,11 +23,13 @@ describe("User Authentication Test", () => {
 
   test("User Register Test", async () => {
     User.checkUserByEmail = jest.fn().mockResolvedValue(false);
-    User.create = jest.fn().mockResolvedValue(user);
+    User.create = jest.fn();
+    (hashPassword as jest.Mock) = jest.fn();
 
-    const createdUser = await registerUser(user);
+    await registerUser(user);
 
-    expect(createdUser).toMatchObject<IUser>(user);
+    expect(User.create).toHaveBeenCalled();
+    expect(hashPassword).toHaveBeenCalled();
   });
 
   test("User Login Test", async () => {

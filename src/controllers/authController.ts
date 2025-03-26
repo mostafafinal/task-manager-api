@@ -11,14 +11,11 @@ export const signUp: RegularMiddleware = async (req, res, next) => {
   try {
     const data: IUser = req.body;
 
-    const user = await authService.registerUser({ ...data });
-
-    if (!user) throw new Error("regiseration failed");
+    await authService.registerUser({ ...data });
 
     res.status(201).json({
       status: "success",
       message: "registered successfully!",
-      user: { ...user },
     });
   } catch (error) {
     console.error(error);
