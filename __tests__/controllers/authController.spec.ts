@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 import { IUser } from "../../src/types/schemas";
 import * as authService from "../../src/services/authService";
 
-describe("Auth Controller Test", () => {
+describe("authentication controller suite", () => {
   const user: IUser = {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
@@ -16,7 +16,7 @@ describe("Auth Controller Test", () => {
 
   afterAll(() => jest.clearAllMocks());
 
-  test("Register new user", async () => {
+  test("register new user request", async () => {
     const res = await request(app)
       .post("/auth/register")
       .send({
@@ -29,5 +29,13 @@ describe("Auth Controller Test", () => {
       ...user,
       password: res.body.user.password,
     });
+  });
+
+  test("logout request", async () => {
+    const res = await request(app)
+      .delete("/auth/logout")
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+
+    expect(res.status).toEqual(204);
   });
 });
