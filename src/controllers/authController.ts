@@ -36,7 +36,9 @@ export const loginLocal = [
       }
 
       if (!user) {
-        return res.json({ status: "fail", message: "failed to login!" });
+        return res
+          .status(401)
+          .json({ status: "fail", message: "failed to login!" });
       }
 
       req.user = user as HydratedDocument<IUser>;
