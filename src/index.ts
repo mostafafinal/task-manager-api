@@ -6,8 +6,9 @@ import mongoose from "mongoose";
 import authRouter from "./routes/authRouter";
 import projectRouter from "./routes/projectRouter";
 import taskRouter from "./routes/taskRouter";
-import "./configs/passport";
 import userRouter from "./routes/userRouter";
+import "./configs/passport";
+import "./configs/agenda";
 
 dotenv.config();
 
