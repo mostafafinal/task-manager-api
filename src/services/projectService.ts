@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { Project } from "../models/Project";
 import { ProjectModel } from "../types/schemas";
 import agenda from "../configs/agenda";
+import { User } from "../models/User";
 
 export const createProject = async (
   projectData: ProjectModel
@@ -10,6 +11,15 @@ export const createProject = async (
     if (!projectData) throw new Error("Service: project data's not provided");
 
     const project = await Project.create(projectData);
+
+    if (!project) throw new Error("Service: failed to create project");
+
+    await User.updateOne(
+      { _id: projectData.userId },
+      {
+        $push: { projects: project.id },
+      }
+    );
 
     return project;
   } catch (error) {
