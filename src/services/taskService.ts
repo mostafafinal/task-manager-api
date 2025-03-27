@@ -1,6 +1,7 @@
-import { Types } from "mongoose";
+import { HydratedDocument, Types } from "mongoose";
 import { Task } from "../models/Task";
 import { TaskModel } from "../types/schemas";
+import { Project } from "../models/Project";
 
 export const getTask = async (
   taskId: Types.ObjectId
@@ -24,7 +25,14 @@ export const createTask = async (
   try {
     if (!taskData) throw new Error("Service: task data's not provided");
 
-    const task: TaskModel = await Task.create(taskData);
+    const task: HydratedDocument<TaskModel> = await Task.create(taskData);
+
+    if (!task) throw new Error("Service: failed to create task");
+
+    await Project.updateOne(
+      { _id: taskData.projectId },
+      { $push: { tasks: task.id } }
+    );
 
     return task;
   } catch (error) {
