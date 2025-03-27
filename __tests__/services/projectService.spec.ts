@@ -1,10 +1,4 @@
-import {
-  createProject,
-  deleteProject,
-  getProject,
-  getProjects,
-  updateProject,
-} from "../../src/services/projectService";
+import * as service from "../../src/services/projectService";
 import { Project } from "../../src/models/Project";
 import agenda from "../../src/configs/agenda";
 import { faker } from "@faker-js/faker";
@@ -13,6 +7,7 @@ import { Types } from "mongoose";
 import { User } from "../../src/models/User";
 
 jest.mock("../../src/models/Project");
+jest.mock("../../src/models/User");
 jest.mock("../../src/configs/agenda");
 
 describe("project service testing", () => {
@@ -28,20 +23,22 @@ describe("project service testing", () => {
     userId: new Types.ObjectId(faker.database.mongodbObjectId()),
   };
 
+  afterEach(() => jest.clearAllMocks());
+
   test("create new project test", async () => {
     Project.create = jest.fn().mockResolvedValue(project);
     jest.spyOn(User, "updateOne");
 
-    await createProject(project);
+    await service.createProject(project);
 
     expect(Project.create).toHaveBeenCalledWith(project);
     expect(User.updateOne).toHaveBeenCalled();
   });
 
-  test.skip("get all projects test", async () => {
+  test("get all projects test", async () => {
     Project.find = jest.fn();
 
-    await getProjects(id);
+    await service.getProjects(id);
 
     expect(Project.find).toHaveBeenCalledWith({ userId: id });
   });
@@ -49,13 +46,13 @@ describe("project service testing", () => {
   test.skip("get project data", async () => {
     Project.findById = jest.fn().mockResolvedValue(project);
 
-    const projectGet: ProjectModel | undefined = await getProject(id);
+    const projectGet: ProjectModel | undefined = await service.getProject(id);
 
     expect(Project.findById).toHaveBeenLastCalledWith(id);
     expect(projectGet).toMatchObject<ProjectModel>(project);
   });
 
-  test.skip("update project test", async () => {
+  test("update project test", async () => {
     const newData: Partial<ProjectModel> = {
       name: faker.commerce.productName(),
       deadline: faker.date.future(),
@@ -63,7 +60,7 @@ describe("project service testing", () => {
 
     Project.updateOne = jest.fn();
 
-    await updateProject(id, newData);
+    await service.updateProject(id, newData);
 
     expect(Project.updateOne).toHaveBeenLastCalledWith(
       { _id: id },
@@ -71,14 +68,16 @@ describe("project service testing", () => {
     );
   });
 
-  test.skip("delete project test", async () => {
+  test("delete project test", async () => {
     Project.deleteOne = jest.fn();
+    jest.spyOn(User, "updateOne");
 
     agenda.now = jest.fn();
 
-    await deleteProject(id);
+    await service.deleteProject(id, id);
 
     expect(Project.deleteOne).toHaveBeenCalledWith({ _id: id });
+    expect(User.updateOne).toHaveBeenCalled();
     expect(agenda.now).toHaveBeenLastCalledWith("delete project tasks", {
       projectId: id,
     });

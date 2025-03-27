@@ -80,11 +80,17 @@ export const updateProject = async (
   }
 };
 
-export const deleteProject = async (projectId: Types.ObjectId) => {
+export const deleteProject = async (
+  projectId: Types.ObjectId,
+  userId: Types.ObjectId
+) => {
   try {
-    if (!projectId) throw new Error("Service: project id's not provided");
+    if (!projectId || !userId)
+      throw new Error("Service: project or user id's not provided");
 
     await Project.deleteOne({ _id: projectId });
+
+    await User.updateOne({ _id: userId }, { $pull: { projects: projectId } });
 
     agenda.now("delete project tasks", { projectId: projectId });
   } catch (error) {
