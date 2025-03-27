@@ -9,7 +9,7 @@ export const deleteProjectTasks = (agenda: Agenda) => {
     agenda.define("delete project tasks", async (job: Job) => {
       const projectId = job.attrs.data as ObjectId;
 
-      await Task.deleteMany(projectId);
+      await Task.deleteMany({ projectId: projectId });
     });
   } catch (error) {
     console.error(error);
