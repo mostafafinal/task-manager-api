@@ -27,6 +27,10 @@ const taskSchema = new Schema<TaskModel>(
       type: Date,
       required: [true, "The project should has a deadline"],
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
     projectId: {
       type: Schema.Types.ObjectId,
       required: true,

@@ -56,6 +56,7 @@ describe("Task controller testing", () => {
 
     const res: Response = await request(app)
       .put(`/tasks/${id}`)
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
       .send({
         newData: {
           description: newDes,

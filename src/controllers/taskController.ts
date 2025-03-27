@@ -5,6 +5,8 @@ import { TaskModel } from "../types/schemas";
 
 export const createTaskPost: RegularMiddleware = async (req, res, next) => {
   try {
+    if (!req.user?.id) throw new Error("controller: user is not existed!");
+
     const task: TaskModel = {
       name: req.body.name,
       priority: req.body.priority,
@@ -12,6 +14,7 @@ export const createTaskPost: RegularMiddleware = async (req, res, next) => {
       deadline: req.body.deadline,
       description: req.body.description,
       projectId: req.body.projectId,
+      userId: req.user.id,
     };
 
     const createdTask: TaskModel | undefined = await service.createTask(task);

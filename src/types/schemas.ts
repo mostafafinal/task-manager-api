@@ -19,6 +19,7 @@ export interface TaskModel {
   deadline: Date;
   priority: string;
   description?: string;
+  userId: Types.ObjectId;
   projectId: Types.ObjectId;
 }
 
