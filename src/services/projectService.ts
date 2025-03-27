@@ -92,7 +92,7 @@ export const deleteProject = async (
 
     await User.updateOne({ _id: userId }, { $pull: { projects: projectId } });
 
-    agenda.now("delete project tasks", { projectId: projectId });
+    await agenda.now("delete project tasks", projectId);
   } catch (error) {
     console.error(error);
   }
