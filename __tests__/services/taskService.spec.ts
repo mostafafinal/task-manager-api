@@ -64,10 +64,12 @@ describe("task service testing", () => {
   });
 
   test("delete task test", async () => {
-    Task.deleteOne = jest.fn();
+    Task.findOneAndDelete = jest.fn().mockResolvedValue(task);
+    jest.spyOn(Project, "updateOne");
 
     await deleteTask(id);
 
-    expect(Task.deleteOne).toHaveBeenCalledWith({ _id: id });
+    expect(Task.findOneAndDelete).toHaveBeenCalled();
+    expect(Project.updateOne).toHaveBeenCalled();
   });
 });

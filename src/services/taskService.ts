@@ -56,9 +56,17 @@ export const updateTask = async (
 
 export const deleteTask = async (taskId: Types.ObjectId) => {
   try {
-    if (!taskId) throw new Error("Service: task id's not provided");
+    if (!taskId) throw new Error("Service: task or project id's not provided");
 
-    await Task.deleteOne({ _id: taskId });
+    const deletedTask: HydratedDocument<TaskModel> | null =
+      await Task.findOneAndDelete({ _id: taskId });
+
+    if (!deletedTask) throw new Error("Serive: failed to delete task");
+
+    await Project.updateOne(
+      { _id: deletedTask.projectId },
+      { $pull: { tasks: taskId } }
+    );
   } catch (error) {
     console.error(error);
   }
