@@ -13,9 +13,12 @@ const jobTypes: string[] = process.env.JOB_TYPES
   ? process.env.JOB_TYPES.split(",")
   : [];
 
-jobTypes.forEach((type) =>
-  import(`../jobs/${type}`).then((job) => job[type](agenda))
-);
+jobTypes.forEach((type) => {
+  if (process.env.NOD_ENV === "development")
+    return import(`../jobs/${type}`).then((job) => job[type](agenda));
+
+  import(`../jobs/${type}.js`).then((job) => job[type](agenda));
+});
 
 if (jobTypes.length) {
   agenda.start();
