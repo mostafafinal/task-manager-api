@@ -18,8 +18,11 @@ export const signUp: RegularMiddleware = async (req, res, next) => {
       message: "registered successfully!",
     });
   } catch (error) {
-    console.error(error);
-    res.status(401).json({ status: "fail", message: "failed to register" });
+    if (error instanceof Error) {
+      res.status(400).json({ status: "fail", message: error.message });
+
+      return;
+    }
 
     next(error);
   }
@@ -27,15 +30,17 @@ export const signUp: RegularMiddleware = async (req, res, next) => {
 
 export const loginLocal = [
   (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate("local", { session: false }, function (err, user) {
+    passport.authenticate("local", { session: false }, function (
+      err,
+      user,
+      info
+    ) {
       if (err) {
         return next(err);
       }
 
       if (!user) {
-        return res
-          .status(401)
-          .json({ status: "fail", message: "failed to login!" });
+        return res.status(401).json({ status: "fail", ...(info as object) });
       }
 
       req.user = user as HydratedDocument<IUser>;
@@ -72,7 +77,6 @@ export const logout: [RegularMiddleware[], RegularMiddleware] = [
         .clearCookie("x-auth-token", { maxAge: 0, sameSite: "strict" })
         .end();
     } catch (error) {
-      console.error(error);
       next(error);
     }
   },
