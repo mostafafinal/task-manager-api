@@ -13,12 +13,14 @@ export const getUserGet: RegularMiddleware = async (req, res, next) => {
 
     const user: Partial<IUser> | undefined = await service.getUserById(id);
 
-    if (!user)
-      res.status(404).json({ status: "fail", message: "user not found!" });
-
     res.status(200).json({ user: user });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res.status(401).json({ status: "fail", message: error.message });
+
+      return;
+    }
+
     next(error);
   }
 };
