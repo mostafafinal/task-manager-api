@@ -11,9 +11,7 @@ const agendaMock = {
 } as unknown as jest.Mocked<Agenda>;
 const jobDataMock = {
   attrs: {
-    data: {
-      userId: "id-mock",
-    },
+    data: "id-mock",
   },
 } as Job;
 

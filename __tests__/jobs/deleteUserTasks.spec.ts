@@ -1,21 +1,22 @@
+import { deleteUserTasks } from "../../src/jobs/deleteUserTasks";
 import { Agenda, Job } from "@hokify/agenda";
-import { deleteProjectTasks } from "../../src/jobs/deleteProjectTasks";
 import { Task } from "../../src/models/Task";
 
 jest.mock("../../src/models/Task");
 
+afterAll(() => jest.clearAllMocks());
+
 const agendaMock = {
   define: jest.fn(),
 } as unknown as jest.Mocked<Agenda>;
-
 const jobDataMock = {
   attrs: {
     data: "id-mock",
   },
-} as unknown as Job;
+} as Job;
 
-test("delete project tasks job test", async () => {
-  deleteProjectTasks(agendaMock);
+test("delete user tasks job", async () => {
+  deleteUserTasks(agendaMock);
 
   const jobCallbackMock = agendaMock.define.mock.calls[0][1];
 
@@ -24,8 +25,8 @@ test("delete project tasks job test", async () => {
   await jobCallbackMock(jobDataMock);
 
   expect(agendaMock.define).toHaveBeenCalledWith(
-    "delete project tasks",
+    "delete user tasks",
     expect.any(Function)
   );
-  expect(Task.deleteMany).toHaveBeenCalledWith({ projectId: "id-mock" });
+  expect(Task.deleteMany).toHaveBeenCalledWith({ userId: "id-mock" });
 });
