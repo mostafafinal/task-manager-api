@@ -4,6 +4,7 @@ import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/userService";
 import { IUser } from "../../src/types/schemas";
 import * as bcrypt from "../../src/utils/bcryption";
+import agenda from "../../src/configs/agenda";
 
 jest.mock("../../src/models/User");
 jest.mock("../../src/utils/bcryption");
@@ -18,7 +19,9 @@ describe("User service suite", () => {
     email: faker.internet.email(),
   };
 
-  test.skip("get user data", async () => {
+  afterEach(() => jest.clearAllMocks());
+
+  test("get user data", async () => {
     User.findById = jest.fn().mockResolvedValue(user);
 
     const userData: Partial<IUser> | undefined = await service.getUserById(id);
@@ -48,5 +51,15 @@ describe("User service suite", () => {
     expect(User.updateOne).toHaveBeenCalled();
     expect(bcrypt.verifyPassword).toHaveBeenCalledTimes(2);
     expect(bcrypt.hashPassword).toHaveBeenCalled();
+  });
+
+  test("delete user", async () => {
+    User.deleteOne = jest.fn();
+    jest.spyOn(agenda, "now");
+
+    await service.deleteUserById(id);
+
+    expect(User.deleteOne).toHaveBeenCalledWith({ _id: id });
+    expect(agenda.now).toHaveBeenCalledTimes(2);
   });
 });
