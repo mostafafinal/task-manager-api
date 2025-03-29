@@ -53,7 +53,15 @@ export const getTaskGet: RegularMiddleware = async (req, res, next) => {
 
 export const updateTaskPost: RegularMiddleware = async (req, res, next) => {
   try {
-    const { newData } = req.body;
+    if (!req.params.id) throw new Error("Controller: task id's not provided");
+
+    const newData: Partial<TaskModel> = {
+      name: req.body.name,
+      deadline: req.body.deadline,
+      priority: req.body.priority,
+      description: req.body.description,
+      status: req.body.status,
+    };
     const taskId = ObjectId.createFromHexString(req.params.id);
 
     if (!newData) throw new Error("task data's not provided");
