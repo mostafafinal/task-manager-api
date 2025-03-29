@@ -19,16 +19,21 @@ export const createTaskPost: RegularMiddleware = async (req, res, next) => {
 
     const createdTask: TaskModel | undefined = await service.createTask(task);
 
-    if (!createdTask)
-      res.status(404).json({ status: "fail", message: "task not created" });
-
     res.status(201).json({
       status: "success",
       message: "task created successfully",
       data: createdTask,
     });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res.status(401).json({
+        status: "fail",
+        message: error.message,
+      });
+
+      return;
+    }
+
     next(error);
   }
 };
@@ -41,19 +46,24 @@ export const getTaskGet: RegularMiddleware = async (req, res, next) => {
 
     const task: TaskModel | undefined = await service.getTask(taskId);
 
-    if (!task)
-      res.status(404).json({ status: "fail", message: "task not found!" });
-
     res.status(200).json({ data: task });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res.status(401).json({
+        status: "fail",
+        message: error.message,
+      });
+
+      return;
+    }
+
     next(error);
   }
 };
 
 export const updateTaskPost: RegularMiddleware = async (req, res, next) => {
   try {
-    if (!req.params.id) throw new Error("Controller: task id's not provided");
+    if (!req.params.id) throw new Error("task id's not provided");
 
     const newData: Partial<TaskModel> = {
       name: req.body.name,
@@ -74,9 +84,12 @@ export const updateTaskPost: RegularMiddleware = async (req, res, next) => {
       message: "task updated successfully",
     });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res.status(401).json({ status: "fail", message: error.message });
 
-    res.json({ status: "fail", message: "failed to update task" });
+      return;
+    }
+
     next(error);
   }
 };
@@ -93,9 +106,14 @@ export const deleteTaskPost: RegularMiddleware = async (req, res, next) => {
       message: "task deleted successfully",
     });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res
+        .status(401)
+        .json({ status: "fail", message: "failed to delete task" });
 
-    res.json({ status: "fail", message: "failed to delete task" });
+      return;
+    }
+
     next(error);
   }
 };
