@@ -22,16 +22,21 @@ export const createProjectPost: RegularMiddleware = async (req, res, next) => {
     const createdProject: ProjectModel | undefined =
       await service.createProject(project);
 
-    if (!createdProject)
-      res.status(404).json({ status: "fail", message: "project not created" });
-
     res.status(201).json({
       status: "success",
       message: "project created successfully",
       data: createdProject,
     });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res.status(401).json({
+        status: "fail",
+        message: error.message,
+      });
+
+      return;
+    }
+
     next(error);
   }
 };
@@ -49,7 +54,15 @@ export const getProjects: RegularMiddleware = async (req, res, next) => {
       data: projects,
     });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res.status(401).json({
+        status: "fail",
+        message: error.message,
+      });
+
+      return;
+    }
+
     next(error);
   }
 };
@@ -63,12 +76,17 @@ export const getProject: RegularMiddleware = async (req, res, next) => {
     const project: ProjectModel | undefined =
       await service.getProject(projectId);
 
-    if (!project)
-      res.status(404).json({ status: "fail", message: "project not found!" });
-
     res.status(200).json({ data: project });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res.status(401).json({
+        status: "fail",
+        message: error.message,
+      });
+
+      return;
+    }
+
     next(error);
   }
 };
@@ -88,9 +106,15 @@ export const updateProjectPost: RegularMiddleware = async (req, res, next) => {
       message: "project updated successfully",
     });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res.status(401).json({
+        status: "fail",
+        message: error.message,
+      });
 
-    res.json({ status: "fail", message: "failed to update project" });
+      return;
+    }
+
     next(error);
   }
 };
@@ -110,9 +134,15 @@ export const deleteProjectPost: RegularMiddleware = async (req, res, next) => {
       message: "project deleted successfully",
     });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      res.status(401).json({
+        status: "fail",
+        message: error.message,
+      });
 
-    res.json({ status: "fail", message: "failed to delete project" });
+      return;
+    }
+
     next(error);
   }
 };
