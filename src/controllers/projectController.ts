@@ -93,11 +93,16 @@ export const getProject: RegularMiddleware = async (req, res, next) => {
 
 export const updateProjectPost: RegularMiddleware = async (req, res, next) => {
   try {
-    const { newData } = req.body;
-    const projectId = ObjectId.createFromHexString(req.params.id);
+    if (!req.params.id) throw new Error("project data's not provided");
 
-    if (!newData) throw new Error("project data's not provided");
-    if (!projectId) throw new Error("user credentials are not existed");
+    const newData: Partial<ProjectModel> = {
+      name: req.body.name,
+      deadline: req.body.deadline,
+      priority: req.body.priority,
+      description: req.body.description,
+      status: req.body.status,
+    };
+    const projectId = ObjectId.createFromHexString(req.params.id);
 
     await service.updateProject(projectId, newData);
 
