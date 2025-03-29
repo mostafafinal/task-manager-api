@@ -1,11 +1,11 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
-  "type": "module",
+  "main": "index.ts",
   "scripts": {
-    "start": "tsx watch src/index.ts",
-    "build": "echo No need to build, tsx runs typescript",
+    "start": "node --watch ./dist/index.js",
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
     "db": "tsx -r dotenv/config src/populateDB.ts",
     "test": "jest --forceExit",
     "lint": "eslint 'src/**/*.{js,ts}' --fix",
@@ -14,7 +14,7 @@
     "format:check": "prettier --check 'src/**/*.{ts,js,json,md}'"
   },
   "keywords": [],
-  "author": "",
+  "author": "Mostafa Hasan",
   "license": "ISC",
   "description": "",
   "dependencies": {
