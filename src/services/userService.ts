@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { IUser } from "../types/schemas";
 import { User } from "../models/User";
 import * as bcrypt from "../utils/bcryption";
+import agenda from "../configs/agenda";
 
 export const getUserById = async (
   userId: Types.ObjectId
@@ -42,6 +43,19 @@ export const changeUserPassword = async (
       throw new Error("user password's already the same!");
 
     await User.updateOne({ password: newHashedPassword });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const deleteUserById = async (userId: Types.ObjectId): Promise<void> => {
+  try {
+    if (!userId) throw new Error("service: user id's not provided");
+
+    User.deleteOne({ _id: userId });
+
+    agenda.now("delete user projects", userId);
+    agenda.now("delete user tasks", userId);
   } catch (error) {
     console.error(error);
   }
