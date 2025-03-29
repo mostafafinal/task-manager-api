@@ -74,9 +74,6 @@ export const updateTaskPost: RegularMiddleware = async (req, res, next) => {
     };
     const taskId = ObjectId.createFromHexString(req.params.id);
 
-    if (!newData) throw new Error("task data's not provided");
-    if (!taskId) throw new Error("task credentials are not existed");
-
     await service.updateTask(taskId, newData);
 
     res.status(200).json({
