@@ -121,11 +121,11 @@ export const updateProjectPost: RegularMiddleware = async (req, res, next) => {
 
 export const deleteProjectPost: RegularMiddleware = async (req, res, next) => {
   try {
+    if (!req.user?.id || !req.params.id)
+      throw new Error("user credentials are not existed");
+
     const userId = ObjectId.createFromHexString(req.user?.id);
     const projectId = ObjectId.createFromHexString(req.params.id);
-
-    if (!projectId || !userId)
-      throw new Error("user credentials are not existed");
 
     await service.deleteProject(projectId, userId);
 
