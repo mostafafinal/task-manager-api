@@ -24,3 +24,29 @@ export const getUserGet: RegularMiddleware = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteUserDelete: RegularMiddleware = async (req, res, next) => {
+  try {
+    if (!req.user?.id)
+      throw new Error("user credentials are not existed in the request!");
+
+    const id: Types.ObjectId = ObjectId.createFromHexString(req.user?.id);
+
+    await service.deleteUserById(id);
+
+    res
+      .status(204)
+      .json({
+        status: "success",
+        message: "your account's been deleted permanently!",
+      });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(401).json({ status: "fail", message: error.message });
+
+      return;
+    }
+
+    next(error);
+  }
+};
