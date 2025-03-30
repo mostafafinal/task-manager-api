@@ -39,7 +39,8 @@ const uri = process.env.MONGO_URL as string;
 
 const fakeTaskData = async function* (
   tasksVolume: number,
-  projectId: ObjectId
+  projectId: ObjectId,
+  userId: ObjectId
 ) {
   try {
     if (!projectId) throw new Error("User id is not provided for tasks");
@@ -56,6 +57,7 @@ const fakeTaskData = async function* (
         priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
         description: faker.commerce.productDescription(),
         projectId: projectId,
+        userId: userId,
       });
 
       yield task.id;
@@ -87,7 +89,8 @@ const fakeProjectData = async function* (
 
       for await (const taskId of fakeTaskData(
         tasksPerProjectVolume,
-        project.id
+        project.id,
+        userId
       )) {
         await project.updateOne({ $push: { tasks: taskId } });
       }
