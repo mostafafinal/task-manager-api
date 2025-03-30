@@ -24,4 +24,15 @@ describe("User controller suite", () => {
     expect(res.statusCode).toEqual(200);
     expect(res.body.user).toBeDefined();
   });
+
+  test("delete user by id request", async () => {
+    (service.deleteUserById as jest.Mock) = jest.fn();
+
+    const res: Response = await request(app)
+      .delete("/user/deleteaccount")
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+
+    expect(service.deleteUserById).toHaveBeenCalled();
+    expect(res.statusCode).toEqual(204);
+  });
 });
