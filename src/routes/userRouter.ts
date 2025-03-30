@@ -8,4 +8,6 @@ userRouter.use(isAuth);
 
 userRouter.get("/", controller.getUserGet);
 
+userRouter.delete("/deleteaccount", controller.deleteUserDelete);
+
 export default userRouter;
