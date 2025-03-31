@@ -66,6 +66,27 @@ export const loginGoogleCB: RegularMiddleware[] = [
   signToken,
 ];
 
+export const forgetPasswordPost: RegularMiddleware = async (req, res, next) => {
+  try {
+    if (!req.body.email) throw new Error("user email's not provided");
+
+    await authService.forgetPassword(req.body.email);
+
+    res.status(204).json({
+      status: "success",
+      message: "we've sent a reset password email to you!",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ status: "fail", message: error.message });
+
+      return;
+    }
+
+    next(error);
+  }
+};
+
 export const logout: [RegularMiddleware[], RegularMiddleware] = [
   isAuth,
   async (req, res, next) => {
