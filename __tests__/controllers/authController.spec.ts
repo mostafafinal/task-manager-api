@@ -12,11 +12,11 @@ describe("authentication controller suite", () => {
     password: faker.internet.password(),
   };
 
-  jest.spyOn(authService, "registerUser");
-
-  afterAll(() => jest.clearAllMocks());
+  afterEach(() => jest.clearAllMocks());
 
   test("register new user request", async () => {
+    jest.spyOn(authService, "registerUser");
+
     const res = await request(app)
       .post("/auth/register")
       .send({
@@ -26,6 +26,18 @@ describe("authentication controller suite", () => {
     expect(authService.registerUser).toHaveBeenCalledWith(user);
     expect(res.statusCode).toEqual(201);
     expect(res.body.status).toBe("success");
+  });
+
+  test("forget password request", async () => {
+    jest.spyOn(authService, "forgetPassword");
+
+    const res = await request(app)
+      .post("/auth/forgetpassword")
+      .send({ email: user.email });
+
+    expect(authService.forgetPassword).toHaveBeenCalledWith(user.email);
+    expect(res.statusCode).toEqual(204);
+    expect(res.body).toBeDefined();
   });
 
   test("logout request", async () => {
