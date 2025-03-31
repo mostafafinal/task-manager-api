@@ -53,6 +53,28 @@ describe("User service suite", () => {
     expect(bcrypt.hashPassword).toHaveBeenCalled();
   });
 
+  test("reset user password", async () => {
+    const mockReturnedPassword = jest.fn().mockResolvedValue("12345678");
+    const newPaswordMock: string = "123456789";
+    (User.findById as jest.Mock).mockReturnValue({
+      select: mockReturnedPassword,
+    });
+
+    User.updateOne = jest.fn();
+
+    (bcrypt.hashPassword as jest.Mock) = jest
+      .fn()
+      .mockResolvedValue(newPaswordMock);
+
+    await service.resetUserPassword(id, newPaswordMock);
+
+    expect(bcrypt.hashPassword).toHaveBeenCalledWith(newPaswordMock);
+    expect(User.updateOne).toHaveBeenCalledWith(
+      { _id: id },
+      { password: newPaswordMock }
+    );
+  });
+
   test("delete user", async () => {
     User.deleteOne = jest.fn();
     jest.spyOn(agenda, "now");
