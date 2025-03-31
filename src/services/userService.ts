@@ -48,6 +48,22 @@ export const changeUserPassword = async (
   }
 };
 
+export const resetUserPassword = async (
+  userId: Types.ObjectId,
+  newPassword: string
+) => {
+  try {
+    if (!userId || !newPassword)
+      throw new Error("either user id or new password is not provided");
+
+    const hashedPassword = await bcrypt.hashPassword(newPassword);
+
+    await User.updateOne({ _id: userId }, { password: hashedPassword });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const deleteUserById = async (userId: Types.ObjectId): Promise<void> => {
   try {
     if (!userId) throw new Error("service: user id's not provided");
