@@ -42,7 +42,7 @@ export const changeUserPassword = async (
     if (await bcrypt.verifyPassword(newPassword, userPassword as string))
       throw new Error("user password's already the same!");
 
-    await User.updateOne({ password: newHashedPassword });
+    await User.updateOne({ _id: userId }, { password: newHashedPassword });
   } catch (error) {
     console.error(error);
   }

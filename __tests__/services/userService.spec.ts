@@ -43,12 +43,17 @@ describe("User service suite", () => {
       .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(false);
 
-    (bcrypt.hashPassword as jest.Mock) = jest.fn();
+    (bcrypt.hashPassword as jest.Mock) = jest
+      .fn()
+      .mockResolvedValue("12345678910");
 
     await service.changeUserPassword(id, "12345678", "12345678910");
 
     expect(User.findById).toHaveBeenCalledWith(id);
-    expect(User.updateOne).toHaveBeenCalled();
+    expect(User.updateOne).toHaveBeenCalledWith(
+      { _id: id },
+      { password: "12345678910" }
+    );
     expect(bcrypt.verifyPassword).toHaveBeenCalledTimes(2);
     expect(bcrypt.hashPassword).toHaveBeenCalled();
   });
