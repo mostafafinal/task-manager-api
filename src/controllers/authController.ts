@@ -72,7 +72,7 @@ export const forgetPasswordPost: RegularMiddleware = async (req, res, next) => {
 
     await authService.forgetPassword(req.body.email);
 
-    res.status(204).json({
+    res.status(200).json({
       status: "success",
       message: "we've sent a reset password email to you!",
     });
