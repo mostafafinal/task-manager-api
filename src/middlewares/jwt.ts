@@ -1,7 +1,4 @@
-import jsonwebtoken from "jsonwebtoken";
-const { sign } = jsonwebtoken;
-type JwtPayload = jsonwebtoken.JwtPayload;
-type SignOptions = jsonwebtoken.SignOptions;
+import { JwtPayload, sign, SignOptions } from "jsonwebtoken";
 import { RegularMiddleware } from "../types/expressMiddleware";
 
 export const signToken: RegularMiddleware = async (req, res, next) => {
