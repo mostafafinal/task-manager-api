@@ -4,12 +4,12 @@ import isAuth from "../middlewares/isAuth";
 
 const userRouter: Router = Router();
 
-userRouter.use(isAuth);
+userRouter.get("/", isAuth, controller.getUserGet);
 
-userRouter.get("/", controller.getUserGet);
+userRouter.put("/changepassword", isAuth, controller.changePasswordPut);
 
-userRouter.put("/changepassword", controller.changePasswordPut);
+userRouter.put("/resetpassword/:token", controller.resetPasswordPut);
 
-userRouter.delete("/deleteaccount", controller.deleteUserDelete);
+userRouter.delete("/deleteaccount", isAuth, controller.deleteUserDelete);
 
 export default userRouter;
