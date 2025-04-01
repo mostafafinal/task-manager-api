@@ -79,7 +79,7 @@ describe("User service suite", () => {
     const tokenMock: string = "token-mock";
     const payloadMock: JwtPayload = { id: id };
 
-    jest.spyOn(token, "verifyToken").mockResolvedValue(payloadMock);
+    jest.spyOn(token, "verifyToken").mockResolvedValue(payloadMock as never);
 
     User.updateOne = jest.fn();
 

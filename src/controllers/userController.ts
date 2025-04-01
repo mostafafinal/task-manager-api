@@ -61,7 +61,12 @@ export const resetPasswordPut: RegularMiddleware = async (req, res, next) => {
 
     if (!req.body.newPassword) throw new Error("new password is not provided!");
 
-    await service.resetUserPassword(req.params.token, req.body.newPassword);
+    const hasBeenReset = await service.resetUserPassword(
+      req.params.token,
+      req.body.newPassword
+    );
+
+    if (!hasBeenReset) throw new Error("failed to reset your password!");
 
     res.status(201).json({
       status: "success",

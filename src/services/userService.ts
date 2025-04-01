@@ -58,13 +58,18 @@ export const resetUserPassword = async (token: string, newPassword: string) => {
     const payload = (await verifyToken(
       token,
       process.env.JWT_SECRET as Secret
-    )) as JwtPayload;
+    )) as unknown as JwtPayload;
 
     if (!payload) throw new Error("invalid token");
 
     const hashedPassword = await bcrypt.hashPassword(newPassword);
 
-    await User.updateOne({ _id: payload.id }, { password: hashedPassword });
+    const resetResult = await User.updateOne(
+      { _id: payload.id },
+      { password: hashedPassword }
+    );
+
+    return resetResult;
   } catch (error) {
     console.error(error);
   }

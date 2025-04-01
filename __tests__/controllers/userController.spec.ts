@@ -41,7 +41,9 @@ describe("User controller suite", () => {
     const tokenMock: string = "token-mock";
     const newPasswordMock: string = "password-mock";
 
-    (service.resetUserPassword as jest.Mock) = jest.fn();
+    (service.resetUserPassword as jest.Mock) = jest
+      .fn()
+      .mockResolvedValue(true);
 
     const res: Response = await request(app)
       .put(`/user/resetpassword/${tokenMock}`)
