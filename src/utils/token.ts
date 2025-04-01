@@ -20,11 +20,7 @@ export const verifyToken = async (token: string, secret: Secret) => {
   try {
     if (!token || !secret) throw new Error("invalid token or secret");
 
-    const validToken = verify(token, secret, (err, payload) => {
-      if (err) return false;
-
-      return payload;
-    });
+    const validToken = verify(token, secret);
 
     return validToken;
   } catch (error) {
