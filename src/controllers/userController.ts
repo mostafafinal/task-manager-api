@@ -40,15 +40,36 @@ export const changePasswordPut: RegularMiddleware = async (req, res, next) => {
       req.body.newPassword
     );
 
-    res
-      .status(201)
-      .json({
-        status: "success",
-        message: "Your password's been changed successfully!",
-      });
+    res.status(201).json({
+      status: "success",
+      message: "Your password's been changed successfully!",
+    });
   } catch (error) {
     if (error instanceof Error) {
       res.status(401).json({ status: "fail", message: error.message });
+
+      return;
+    }
+
+    next(error);
+  }
+};
+
+export const resetPasswordPut: RegularMiddleware = async (req, res, next) => {
+  try {
+    if (!req.params.token) throw new Error("reset token is not existed!");
+
+    if (!req.body.newPassword) throw new Error("new password is not provided!");
+
+    await service.resetUserPassword(req.params.token, req.body.newPassword);
+
+    res.status(201).json({
+      status: "success",
+      message: "Your password's been reset successfully!",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ status: "fail", message: error.message });
 
       return;
     }
