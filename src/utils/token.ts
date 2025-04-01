@@ -1,4 +1,7 @@
 import { JwtPayload, Secret, sign, verify } from "jsonwebtoken";
+import { config } from "dotenv";
+
+config();
 
 export const generateToken = async (payload: JwtPayload, secret: Secret) => {
   try {
@@ -20,7 +23,11 @@ export const verifyToken = async (token: string, secret: Secret) => {
   try {
     if (!token || !secret) throw new Error("invalid token or secret");
 
-    const validToken = verify(token, secret);
+    const validToken = verify(token, secret, (err, payload) => {
+      if (err) return false;
+
+      return payload;
+    });
 
     return validToken;
   } catch (error) {
