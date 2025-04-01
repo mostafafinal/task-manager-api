@@ -5,6 +5,8 @@ import * as service from "../../src/services/userService";
 import { IUser } from "../../src/types/schemas";
 import * as bcrypt from "../../src/utils/bcryption";
 import agenda from "../../src/configs/agenda";
+import * as token from "../../src/utils/token";
+import { JwtPayload } from "jsonwebtoken";
 
 jest.mock("../../src/models/User");
 jest.mock("../../src/utils/bcryption");
@@ -18,8 +20,22 @@ describe("User service suite", () => {
     lastName: faker.person.lastName(),
     email: faker.internet.email(),
   };
+  const originalEnv = process.env;
 
-  afterEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.resetModules();
+
+    process.env = {
+      ...originalEnv,
+      JWT_SECRET: "secret-mock",
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+
+    process.env = originalEnv;
+  });
 
   test("get user data", async () => {
     User.findById = jest.fn().mockResolvedValue(user);
@@ -59,11 +75,11 @@ describe("User service suite", () => {
   });
 
   test("reset user password", async () => {
-    const mockReturnedPassword = jest.fn().mockResolvedValue("12345678");
     const newPaswordMock: string = "123456789";
-    (User.findById as jest.Mock).mockReturnValue({
-      select: mockReturnedPassword,
-    });
+    const tokenMock: string = "token-mock";
+    const payloadMock: JwtPayload = { id: id };
+
+    jest.spyOn(token, "verifyToken").mockResolvedValue(payloadMock);
 
     User.updateOne = jest.fn();
 
@@ -71,8 +87,12 @@ describe("User service suite", () => {
       .fn()
       .mockResolvedValue(newPaswordMock);
 
-    await service.resetUserPassword(id, newPaswordMock);
+    await service.resetUserPassword(tokenMock, newPaswordMock);
 
+    expect(token.verifyToken).toHaveBeenCalledWith(
+      tokenMock,
+      process.env.JWT_SECRET
+    );
     expect(bcrypt.hashPassword).toHaveBeenCalledWith(newPaswordMock);
     expect(User.updateOne).toHaveBeenCalledWith(
       { _id: id },

@@ -3,6 +3,8 @@ import { IUser } from "../types/schemas";
 import { User } from "../models/User";
 import * as bcrypt from "../utils/bcryption";
 import agenda from "../configs/agenda";
+import { verifyToken } from "../utils/token";
+import { JwtPayload, Secret } from "jsonwebtoken";
 
 export const getUserById = async (
   userId: Types.ObjectId
@@ -48,17 +50,21 @@ export const changeUserPassword = async (
   }
 };
 
-export const resetUserPassword = async (
-  userId: Types.ObjectId,
-  newPassword: string
-) => {
+export const resetUserPassword = async (token: string, newPassword: string) => {
   try {
-    if (!userId || !newPassword)
-      throw new Error("either user id or new password is not provided");
+    if (!token || !newPassword)
+      throw new Error("either token or new password is not provided");
+
+    const payload = (await verifyToken(
+      token,
+      process.env.JWT_SECRET as Secret
+    )) as JwtPayload;
+
+    if (!payload) throw new Error("invalid token");
 
     const hashedPassword = await bcrypt.hashPassword(newPassword);
 
-    await User.updateOne({ _id: userId }, { password: hashedPassword });
+    await User.updateOne({ _id: payload.id }, { password: hashedPassword });
   } catch (error) {
     console.error(error);
   }
