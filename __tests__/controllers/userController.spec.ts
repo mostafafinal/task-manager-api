@@ -37,6 +37,23 @@ describe("User controller suite", () => {
     expect(res.statusCode).toEqual(201);
   });
 
+  test("reset user password request", async () => {
+    const tokenMock: string = "token-mock";
+    const newPasswordMock: string = "password-mock";
+
+    (service.resetUserPassword as jest.Mock) = jest.fn();
+
+    const res: Response = await request(app)
+      .put(`/user/resetpassword/${tokenMock}`)
+      .send({ newPassword: newPasswordMock });
+
+    expect(service.resetUserPassword).toHaveBeenCalledWith(
+      tokenMock,
+      newPasswordMock
+    );
+    expect(res.statusCode).toEqual(201);
+  });
+
   test("delete user by id request", async () => {
     (service.deleteUserById as jest.Mock) = jest.fn();
 
