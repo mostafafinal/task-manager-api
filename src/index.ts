@@ -9,6 +9,7 @@ import taskRouter from "./routes/taskRouter";
 import userRouter from "./routes/userRouter";
 import "./configs/passport";
 import "./configs/agenda";
+import { errorHandler } from "./middlewares/errorHandler";
 
 dotenv.config();
 
@@ -41,19 +42,7 @@ app.use("/projects", projectRouter);
 app.use("/tasks", taskRouter);
 
 // Error handling middleware
-app.use(
-  (
-    err: Error,
-    req: express.Request,
-    res: express.Response,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    next: express.NextFunction
-  ) => {
-    console.error(err.stack);
-
-    res.status(500).json({ error: "Something broke!" });
-  }
-);
+app.use(errorHandler);
 
 mongoose
   .connect(DB, {})
