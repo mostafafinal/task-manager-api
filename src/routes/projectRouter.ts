@@ -6,14 +6,15 @@ const projectRouter: Router = Router();
 
 projectRouter.use(isAuth);
 
-projectRouter.get("/", projectController.getProjects);
+projectRouter
+  .route("/")
+  .get(projectController.getProjects)
+  .post(projectController.createProjectPost);
 
-projectRouter.get("/:id", projectController.getProject);
-
-projectRouter.post("/", projectController.createProjectPost);
-
-projectRouter.put("/:id", projectController.updateProjectPost);
-
-projectRouter.delete("/:id", projectController.deleteProjectPost);
+projectRouter
+  .route("/:id")
+  .get(projectController.getProject)
+  .put(projectController.updateProjectPost)
+  .delete(projectController.deleteProjectPost);
 
 export default projectRouter;

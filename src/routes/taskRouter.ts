@@ -6,12 +6,12 @@ const taskRouter: Router = Router();
 
 taskRouter.use(isAuth);
 
-taskRouter.post("/", taskController.createTaskPost);
+taskRouter.route("/").post(taskController.createTaskPost);
 
-taskRouter.get("/:id", taskController.getTaskGet);
-
-taskRouter.put("/:id", taskController.updateTaskPost);
-
-taskRouter.delete("/:id", taskController.deleteTaskPost);
+taskRouter
+  .route("/:id")
+  .get(taskController.getTaskGet)
+  .put(taskController.updateTaskPost)
+  .delete(taskController.deleteTaskPost);
 
 export default taskRouter;
