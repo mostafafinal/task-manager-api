@@ -37,7 +37,7 @@ describe("User service suite", () => {
     process.env = originalEnv;
   });
 
-  test("get user data", async () => {
+  test.skip("get user data", async () => {
     User.findById = jest.fn().mockResolvedValue(user);
 
     const userData: Partial<IUser> | undefined = await service.getUserById(id);

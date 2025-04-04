@@ -28,7 +28,7 @@ export const changeUserPassword = async (
   userId: Types.ObjectId,
   oldPassword: string,
   newPassword: string
-): Promise<void | undefined> => {
+): Promise<boolean | undefined> => {
   try {
     if (!userId || !oldPassword || !newPassword)
       throw new Error("either user id or old/new password is not provided");
@@ -44,13 +44,21 @@ export const changeUserPassword = async (
     if (await bcrypt.verifyPassword(newPassword, userPassword as string))
       throw new Error("user password's already the same!");
 
-    await User.updateOne({ _id: userId }, { password: newHashedPassword });
+    const result = await User.updateOne(
+      { _id: userId },
+      { password: newHashedPassword }
+    );
+
+    return result.acknowledged;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const resetUserPassword = async (token: string, newPassword: string) => {
+export const resetUserPassword = async (
+  token: string,
+  newPassword: string
+): Promise<boolean | undefined> => {
   try {
     if (!token || !newPassword)
       throw new Error("either token or new password is not provided");
@@ -64,25 +72,29 @@ export const resetUserPassword = async (token: string, newPassword: string) => {
 
     const hashedPassword = await bcrypt.hashPassword(newPassword);
 
-    const resetResult = await User.updateOne(
+    const result = await User.updateOne(
       { _id: payload.id },
       { password: hashedPassword }
     );
 
-    return resetResult;
+    return result.acknowledged;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const deleteUserById = async (userId: Types.ObjectId): Promise<void> => {
+export const deleteUserById = async (
+  userId: Types.ObjectId
+): Promise<boolean | undefined> => {
   try {
     if (!userId) throw new Error("service: user id's not provided");
 
-    User.deleteOne({ _id: userId });
+    const result = await User.deleteOne({ _id: userId });
 
     agenda.now("delete user projects", userId);
     agenda.now("delete user tasks", userId);
+
+    return result.acknowledged;
   } catch (error) {
     console.error(error);
   }
