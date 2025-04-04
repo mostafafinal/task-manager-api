@@ -1,15 +1,24 @@
 import { Router } from "express";
 import * as controller from "../controllers/userController";
 import isAuth from "../middlewares/isAuth";
+import { tryCatch } from "../utils/tryCatch";
 
 const userRouter: Router = Router();
 
-userRouter.get("/", isAuth, controller.getUserGet);
+userRouter.get("/", isAuth, tryCatch(controller.getUserGet));
 
-userRouter.put("/changepassword", isAuth, controller.changePasswordPut);
+userRouter.put(
+  "/changepassword",
+  isAuth,
+  tryCatch(controller.changePasswordPut)
+);
 
-userRouter.put("/resetpassword/:token", controller.resetPasswordPut);
+userRouter.put("/resetpassword/:token", tryCatch(controller.resetPasswordPut));
 
-userRouter.delete("/deleteaccount", isAuth, controller.deleteUserDelete);
+userRouter.delete(
+  "/deleteaccount",
+  isAuth,
+  tryCatch(controller.deleteUserDelete)
+);
 
 export default userRouter;
