@@ -5,7 +5,7 @@ import { generateToken } from "../utils/token";
 import { Secret } from "jsonwebtoken";
 import { resetPasswordEmail } from "../utils/mail";
 
-type RegisterUser = (data: IUser) => Promise<void | undefined>;
+export type RegisterUser = (data: IUser) => Promise<boolean | undefined>;
 
 export const registerUser: RegisterUser = async (userData) => {
   try {
@@ -15,10 +15,12 @@ export const registerUser: RegisterUser = async (userData) => {
 
     const hashedPassword = await hashPassword(userData.password);
 
-    await User.create({
+    const createdUser = await User.create({
       ...userData,
       password: hashedPassword,
     });
+
+    if (createdUser) return true;
   } catch (error) {
     console.error(error);
   }
@@ -45,7 +47,9 @@ export const loginUser: LoginUser = async (userData) => {
   }
 };
 
-export const forgetPassword = async (userEmail: string) => {
+export type ForgetPassword = (userEmail: string) => Promise<void>;
+
+export const forgetPassword: ForgetPassword = async (userEmail) => {
   try {
     if (!userEmail) throw new Error("user email's not provided");
 
