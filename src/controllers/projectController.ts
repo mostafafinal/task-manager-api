@@ -38,7 +38,7 @@ export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
 
   res.status(200).json({
     status: "success",
-    data: "projects",
+    data: projects,
   });
 };
 
