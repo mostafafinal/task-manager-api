@@ -1,153 +1,104 @@
 import * as service from "../services/projectService";
-import { RegularMiddleware } from "../types/expressMiddleware";
+import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
 import { ObjectId } from "mongodb";
 import { ProjectModel } from "../types/schemas";
-import { Types } from "mongoose";
+import { customError } from "../utils/customError";
 
-export const createProjectPost: RegularMiddleware = async (req, res, next) => {
-  try {
-    const userId: Types.ObjectId = req.user?.id;
+export const createProjectPost: RegularMiddlewareWithoutNext = async (
+  req,
+  res
+) => {
+  if (!req.body || Object.keys(req.body).length <= 0)
+    throw customError("fail", 400, "invalid project data");
 
-    if (!userId) throw new Error("user credentials are not existed");
+  const project: ProjectModel = {
+    ...req.body,
+    userId: req.user?.id,
+  };
 
-    const project: ProjectModel = {
-      name: req.body.name,
-      priority: req.body.priority,
-      status: req.body.status,
-      deadline: req.body.deadline,
-      description: req.body.description,
-      userId: userId,
-    };
+  const createdProject: ProjectModel | undefined =
+    await service.createProject(project);
 
-    const createdProject: ProjectModel | undefined =
-      await service.createProject(project);
+  if (!createdProject || Object.keys(createProjectPost).length <= 0)
+    throw customError();
 
-    res.status(201).json({
-      status: "success",
-      message: "project created successfully",
-      data: createdProject,
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(401).json({
-        status: "fail",
-        message: error.message,
-      });
-
-      return;
-    }
-
-    next(error);
-  }
+  res.status(201).json({
+    status: "success",
+    message: "project created successfully",
+    data: createdProject,
+  });
 };
 
-export const getProjects: RegularMiddleware = async (req, res, next) => {
-  try {
-    const userId = ObjectId.createFromHexString(req.user?.id);
+export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
+  const projects: ProjectModel[] | undefined = await service.getProjects(
+    req.user?.id
+  );
 
-    if (!userId) throw new Error("user credentials are not existed");
+  if (!projects) throw customError();
 
-    const projects: ProjectModel[] | undefined =
-      await service.getProjects(userId);
-
-    res.status(200).json({
-      data: projects,
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(401).json({
-        status: "fail",
-        message: error.message,
-      });
-
-      return;
-    }
-
-    next(error);
-  }
+  res.status(200).json({
+    status: "success",
+    data: "projects",
+  });
 };
 
-export const getProject: RegularMiddleware = async (req, res, next) => {
-  try {
-    if (!req.params.id) throw new Error("task id is not existed");
+export const getProject: RegularMiddlewareWithoutNext = async (req, res) => {
+  if (!req.params.id || req.params.id.length !== 24)
+    throw customError("fail", 400, "invalid project credentials!");
 
-    const projectId = ObjectId.createFromHexString(req.params.id);
+  const projectId = ObjectId.createFromHexString(req.params.id);
 
-    const project: ProjectModel | undefined =
-      await service.getProject(projectId);
+  const project: ProjectModel | undefined = await service.getProject(projectId);
 
-    res.status(200).json({ data: project });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(401).json({
-        status: "fail",
-        message: error.message,
-      });
+  if (!project) throw customError("fail", 404, "project not found!");
 
-      return;
-    }
-
-    next(error);
-  }
+  res.status(200).json({ data: project });
 };
 
-export const updateProjectPost: RegularMiddleware = async (req, res, next) => {
-  try {
-    if (!req.params.id) throw new Error("project data's not provided");
+export const updateProjectPost: RegularMiddlewareWithoutNext = async (
+  req,
+  res
+) => {
+  if (!req.params.id || req.params.id.length !== 24)
+    throw customError("fail", 400, "invalid project credentials!");
 
-    const newData: Partial<ProjectModel> = {
-      name: req.body.name,
-      deadline: req.body.deadline,
-      priority: req.body.priority,
-      description: req.body.description,
-      status: req.body.status,
-    };
-    const projectId = ObjectId.createFromHexString(req.params.id);
+  const projectId = ObjectId.createFromHexString(req.params.id);
 
-    await service.updateProject(projectId, newData);
+  const newData: Partial<ProjectModel> = {
+    ...req.body,
+  };
 
-    res.status(200).json({
-      status: "success",
-      message: "project updated successfully",
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(401).json({
-        status: "fail",
-        message: error.message,
-      });
+  const serviceResult = await service.updateProject(projectId, newData);
 
-      return;
-    }
+  if (!serviceResult) throw customError();
 
-    next(error);
-  }
+  res.status(200).json({
+    status: "success",
+    message: "project updated successfully",
+  });
 };
 
-export const deleteProjectPost: RegularMiddleware = async (req, res, next) => {
-  try {
-    if (!req.user?.id || !req.params.id)
-      throw new Error("user credentials are not existed");
+export const deleteProjectPost: RegularMiddlewareWithoutNext = async (
+  req,
+  res
+) => {
+  if (
+    !req.user?.id ||
+    !req.params.id ||
+    req.user?.id.length !== 24 ||
+    req.params.id.length != 24
+  )
+    throw customError("fail", 400, "invalid user or project credentials");
 
-    const userId = ObjectId.createFromHexString(req.user?.id);
-    const projectId = ObjectId.createFromHexString(req.params.id);
+  const userId = ObjectId.createFromHexString(req.user?.id);
+  const projectId = ObjectId.createFromHexString(req.params.id);
 
-    await service.deleteProject(projectId, userId);
+  const serviceResult = await service.deleteProject(projectId, userId);
 
-    res.status(204).json({
-      status: "success",
-      message: "project deleted successfully",
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(401).json({
-        status: "fail",
-        message: error.message,
-      });
+  if (!serviceResult) throw customError();
 
-      return;
-    }
-
-    next(error);
-  }
+  res.status(204).json({
+    status: "success",
+    message: "project deleted successfully",
+  });
 };

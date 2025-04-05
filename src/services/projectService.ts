@@ -30,21 +30,31 @@ export const createProject: CreateProject = async (projectData) => {
 };
 
 export type GetProjects = (
-  userId: Types.ObjectId
+  userId: Types.ObjectId,
+  page: number,
+  limit: number
 ) => Promise<ProjectModel[] | undefined>;
 
-export const getProjects: GetProjects = async (userId) => {
+export const getProjects = async (
+  userId: Types.ObjectId,
+  page: number = 1,
+  limit: number = 20
+) => {
   try {
     if (!userId) throw new Error("Service: user's id's not provided");
 
-    const projects = await Project.find({ userId: userId }).select([
-      "name",
-      "deadline",
-      "priority",
-      "status",
-    ]);
+    const startIndex: number = (page - 1) * limit;
+    const totalProjects: number = await Project.find({
+      userId: userId,
+    }).countDocuments();
+    const paginations: number = Math.ceil(totalProjects / limit);
 
-    return projects;
+    const projects = await Project.find({ userId: userId })
+      .skip(startIndex)
+      .limit(limit)
+      .select(["name", "deadline", "priority", "status"]);
+
+    return { projects: projects, pages: paginations };
   } catch (error) {
     console.error(error);
   }
