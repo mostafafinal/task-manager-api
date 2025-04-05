@@ -26,17 +26,13 @@ export const signUp: RegularMiddlewareWithoutNext = async (req, res) => {
 };
 
 export const loginLocal = (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate("local", { session: false }, function (
-    err,
-    user,
-    info
-  ) {
+  passport.authenticate("local", { session: false }, function (err, user) {
     if (err) {
       return next(err);
     }
 
     if (!user) {
-      return res.status(401).json({ status: "fail", ...(info as object) });
+      return next(customError("fail", 400, "incorrect email or password"));
     }
 
     req.user = user as HydratedDocument<IUser>;

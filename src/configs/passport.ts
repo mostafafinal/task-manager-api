@@ -72,9 +72,7 @@ const verifyUserCredientials: VerifyFunction = async (
     const user = await loginUser({ email: username, password: password });
 
     if (!user) {
-      return done(null, false, {
-        message: "Incorrect email or password",
-      });
+      return done(null, false);
     }
 
     return done(null, user);
