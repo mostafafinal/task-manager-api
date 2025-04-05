@@ -1,17 +1,18 @@
 import { Router } from "express";
-import * as taskController from "../controllers/taskController";
+import * as controller from "../controllers/taskController";
 import isAuth from "../middlewares/isAuth";
+import { tryCatch } from "../utils/tryCatch";
 
 const taskRouter: Router = Router();
 
 taskRouter.use(isAuth);
 
-taskRouter.route("/").post(taskController.createTaskPost);
+taskRouter.route("/").post(tryCatch(controller.createTaskPost));
 
 taskRouter
   .route("/:id")
-  .get(taskController.getTaskGet)
-  .put(taskController.updateTaskPost)
-  .delete(taskController.deleteTaskPost);
+  .get(tryCatch(controller.getTaskGet))
+  .put(tryCatch(controller.updateTaskPost))
+  .delete(tryCatch(controller.deleteTaskPost));
 
 export default taskRouter;

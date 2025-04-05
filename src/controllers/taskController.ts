@@ -1,116 +1,85 @@
 import * as service from "../services/taskService";
-import { RegularMiddleware } from "../types/expressMiddleware";
+import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
 import { ObjectId } from "mongodb";
 import { TaskModel } from "../types/schemas";
+import { customError } from "../utils/customError";
 
-export const createTaskPost: RegularMiddleware = async (req, res, next) => {
-  try {
-    if (!req.user?.id) throw new Error("controller: user is not existed!");
+export const createTaskPost: RegularMiddlewareWithoutNext = async (
+  req,
+  res
+) => {
+  if (!req.body || Object.keys(req.body).length <= 0)
+    throw customError("fail", 400, "invalid task data");
 
-    const task: TaskModel = {
-      name: req.body.name,
-      priority: req.body.priority,
-      status: req.body.status,
-      deadline: req.body.deadline,
-      description: req.body.description,
-      projectId: req.body.projectId,
-      userId: req.user.id,
-    };
+  const task: TaskModel = {
+    ...req.body,
+    userId: req.user?.id,
+  };
 
-    const createdTask: TaskModel | undefined = await service.createTask(task);
+  const createdTask: TaskModel | undefined = await service.createTask(task);
 
-    res.status(201).json({
-      status: "success",
-      message: "task created successfully",
-      data: createdTask,
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(401).json({
-        status: "fail",
-        message: error.message,
-      });
+  if (createdTask) throw customError();
 
-      return;
-    }
-
-    next(error);
-  }
+  res.status(201).json({
+    status: "success",
+    message: "task created successfully",
+    data: createdTask,
+  });
 };
 
-export const getTaskGet: RegularMiddleware = async (req, res, next) => {
-  try {
-    if (!req.params.id) throw new Error("task id is not existed");
+export const getTaskGet: RegularMiddlewareWithoutNext = async (req, res) => {
+  if (!req.params.id || req.params.id.length !== 24)
+    throw customError("fail", 400, "invalid task credentials");
 
-    const taskId = ObjectId.createFromHexString(req.params.id);
+  const taskId = ObjectId.createFromHexString(req.params.id);
 
-    const task: TaskModel | undefined = await service.getTask(taskId);
+  const task: TaskModel | undefined = await service.getTask(taskId);
 
-    res.status(200).json({ data: task });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(401).json({
-        status: "fail",
-        message: error.message,
-      });
+  if (!task) throw customError();
 
-      return;
-    }
-
-    next(error);
-  }
+  res.status(200).json({ data: task });
 };
 
-export const updateTaskPost: RegularMiddleware = async (req, res, next) => {
-  try {
-    if (!req.params.id) throw new Error("task id's not provided");
+export const updateTaskPost: RegularMiddlewareWithoutNext = async (
+  req,
+  res
+) => {
+  if (!req.params.id || req.params.id.length !== 24)
+    throw customError("fail", 400, "invalid task credentials");
 
-    const newData: Partial<TaskModel> = {
-      name: req.body.name,
-      deadline: req.body.deadline,
-      priority: req.body.priority,
-      description: req.body.description,
-      status: req.body.status,
-    };
-    const taskId = ObjectId.createFromHexString(req.params.id);
+  if (!req.body || Object.keys(req.body).length <= 0)
+    throw customError("fail", 400, "invalid task data");
 
-    await service.updateTask(taskId, newData);
+  const newData: Partial<TaskModel> = {
+    ...req.body,
+  };
+  const taskId = ObjectId.createFromHexString(req.params.id);
 
-    res.status(200).json({
-      status: "success",
-      message: "task updated successfully",
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(401).json({ status: "fail", message: error.message });
+  const serviceResult = await service.updateTask(taskId, newData);
 
-      return;
-    }
+  if (!serviceResult) throw customError();
 
-    next(error);
-  }
+  res.status(200).json({
+    status: "success",
+    message: "task updated successfully",
+  });
 };
 
-export const deleteTaskPost: RegularMiddleware = async (req, res, next) => {
-  try {
-    const taskId = ObjectId.createFromHexString(req.params.id);
-    if (!taskId) throw new Error("task credentials are not existed");
+export const deleteTaskPost: RegularMiddlewareWithoutNext = async (
+  req,
+  res
+) => {
+  if (!req.params.id || req.params.id.length !== 24)
+    throw customError("fail", 400, "invalid task credentials");
 
-    await service.deleteTask(taskId);
+  const taskId = ObjectId.createFromHexString(req.params.id);
 
-    res.status(204).json({
-      status: "success",
-      message: "task deleted successfully",
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      res
-        .status(401)
-        .json({ status: "fail", message: "failed to delete task" });
+  const serviceResult = await service.deleteTask(taskId);
 
-      return;
-    }
+  if (!serviceResult) throw customError();
 
-    next(error);
-  }
+  res.status(204).json({
+    status: "success",
+    message: "task deleted successfully",
+  });
 };
