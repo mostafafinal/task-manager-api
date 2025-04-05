@@ -3,9 +3,11 @@ import { Task } from "../models/Task";
 import { TaskModel } from "../types/schemas";
 import { Project } from "../models/Project";
 
-export const getTask = async (
+export type GetTask = (
   taskId: Types.ObjectId
-): Promise<TaskModel | undefined> => {
+) => Promise<TaskModel | undefined>;
+
+export const getTask: GetTask = async (taskId) => {
   try {
     if (!taskId) throw new Error("task id is not provided");
 
@@ -19,9 +21,9 @@ export const getTask = async (
   }
 };
 
-export const createTask = async (
-  taskData: TaskModel
-): Promise<TaskModel | undefined> => {
+export type CreateTask = (data: TaskModel) => Promise<TaskModel | undefined>;
+
+export const createTask: CreateTask = async (taskData) => {
   try {
     if (!taskData) throw new Error("Service: task data's not provided");
 
@@ -40,21 +42,29 @@ export const createTask = async (
   }
 };
 
-export const updateTask = async (
+export type UpdateTask = (
   taskId: Types.ObjectId,
   updates: Partial<TaskModel>
-) => {
+) => Promise<boolean | undefined>;
+
+export const updateTask: UpdateTask = async (taskId, updates) => {
   try {
     if (!taskId || !updates)
       throw new Error("Service: either invalid task id or empty update data");
 
-    await Task.updateOne({ _id: taskId }, { ...updates });
+    const result = await Task.updateOne({ _id: taskId }, { ...updates });
+
+    return result.acknowledged;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const deleteTask = async (taskId: Types.ObjectId) => {
+export type DeleteTask = (
+  taskId: Types.ObjectId
+) => Promise<boolean | undefined>;
+
+export const deleteTask: DeleteTask = async (taskId) => {
   try {
     if (!taskId) throw new Error("Service: task or project id's not provided");
 
@@ -67,6 +77,8 @@ export const deleteTask = async (taskId: Types.ObjectId) => {
       { _id: deletedTask.projectId },
       { $pull: { tasks: taskId } }
     );
+
+    return true;
   } catch (error) {
     console.error(error);
   }
