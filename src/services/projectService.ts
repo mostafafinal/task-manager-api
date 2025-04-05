@@ -4,9 +4,11 @@ import { ProjectModel } from "../types/schemas";
 import agenda from "../configs/agenda";
 import { User } from "../models/User";
 
-export const createProject = async (
-  projectData: ProjectModel
-): Promise<ProjectModel | undefined> => {
+export type CreateProject = (
+  data: ProjectModel
+) => Promise<ProjectModel | undefined>;
+
+export const createProject: CreateProject = async (projectData) => {
   try {
     if (!projectData) throw new Error("Service: project data's not provided");
 
@@ -27,9 +29,11 @@ export const createProject = async (
   }
 };
 
-export const getProjects = async (
+export type GetProjects = (
   userId: Types.ObjectId
-): Promise<ProjectModel[] | undefined> => {
+) => Promise<ProjectModel[] | undefined>;
+
+export const getProjects: GetProjects = async (userId) => {
   try {
     if (!userId) throw new Error("Service: user's id's not provided");
 
@@ -46,9 +50,11 @@ export const getProjects = async (
   }
 };
 
-export const getProject = async (
+export type GetProject = (
   projectId: Types.ObjectId
-): Promise<ProjectModel | undefined> => {
+) => Promise<ProjectModel | undefined>;
+
+export const getProject: GetProject = async (projectId) => {
   try {
     if (!projectId) throw new Error("project id is not provided");
 
@@ -64,35 +70,43 @@ export const getProject = async (
   }
 };
 
-export const updateProject = async (
+export type UpdateProject = (
   projectId: Types.ObjectId,
   updates: Partial<ProjectModel>
-) => {
+) => Promise<boolean | undefined>;
+
+export const updateProject: UpdateProject = async (projectId, updates) => {
   try {
     if (!projectId || !updates)
       throw new Error(
         "Service: either invalid project id or empty update data"
       );
 
-    await Project.updateOne({ _id: projectId }, { ...updates });
+    const result = await Project.updateOne({ _id: projectId }, { ...updates });
+
+    return result.acknowledged;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const deleteProject = async (
+export type DeleteProject = (
   projectId: Types.ObjectId,
   userId: Types.ObjectId
-) => {
+) => Promise<boolean | undefined>;
+
+export const deleteProject: DeleteProject = async (projectId, userId) => {
   try {
     if (!projectId || !userId)
       throw new Error("Service: project or user id's not provided");
 
-    await Project.deleteOne({ _id: projectId });
+    const result = await Project.deleteOne({ _id: projectId });
 
     await User.updateOne({ _id: userId }, { $pull: { projects: projectId } });
 
     await agenda.now("delete project tasks", projectId);
+
+    return result.acknowledged;
   } catch (error) {
     console.error(error);
   }
