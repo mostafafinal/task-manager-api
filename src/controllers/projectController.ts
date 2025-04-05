@@ -19,7 +19,7 @@ export const createProjectPost: RegularMiddlewareWithoutNext = async (
   const createdProject: ProjectModel | undefined =
     await service.createProject(project);
 
-  if (!createdProject || Object.keys(createProjectPost).length <= 0)
+  if (!createdProject || Object.keys(createdProject).length <= 0)
     throw customError();
 
   res.status(201).json({
