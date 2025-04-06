@@ -8,14 +8,17 @@ import { IUser } from "../types/schemas";
 import { NextFunction, Request, Response } from "express";
 import { HydratedDocument } from "mongoose";
 import { customError } from "../utils/customError";
+import { matchedData, validationResult } from "express-validator";
 
 export const signUp: RegularMiddlewareWithoutNext = async (req, res) => {
-  const data: IUser = req.body;
+  const errors = validationResult(req);
 
-  if (Object.keys(data).length >= 0)
-    throw customError("fail", 400, "invalid user data");
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const result = await authService.registerUser({ ...data });
+  const data = matchedData(req);
+  delete data.confirmPassword;
+
+  const result = await authService.registerUser({ ...data } as IUser);
 
   if (!result) throw customError("fail", 500, "failed to register!");
 
@@ -25,21 +28,31 @@ export const signUp: RegularMiddlewareWithoutNext = async (req, res) => {
   });
 };
 
-export const loginLocal = (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate("local", { session: false }, function (err, user) {
-    if (err) {
-      return next(err);
-    }
+export const loginLocal: RegularMiddleware[] = [
+  async (req, res, next) => {
+    const errors = validationResult(req);
 
-    if (!user) {
-      return next(customError("fail", 400, "incorrect email or password"));
-    }
-
-    req.user = user as HydratedDocument<IUser>;
+    if (!errors.isEmpty())
+      next(customError("fail", 400, errors.array()[0].msg));
 
     next();
-  } as AuthenticateCallback)(req, res, next);
-};
+  },
+  async (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate("local", { session: false }, function (err, user) {
+      if (err) {
+        return next(err);
+      }
+
+      if (!user) {
+        return next(customError("fail", 400, "incorrect email or password"));
+      }
+
+      req.user = user as HydratedDocument<IUser>;
+
+      next();
+    } as AuthenticateCallback)(req, res, next);
+  },
+];
 
 export const loginGoogle: RegularMiddleware[] = [
   passport.authenticate("google", {
@@ -60,9 +73,13 @@ export const forgetPasswordPost: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  if (!req.body.email) throw customError("fail", 400, "invalid user email");
+  const errors = validationResult(req);
 
-  await authService.forgetPassword(req.body.email);
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const email: string = matchedData(req).email;
+
+  await authService.forgetPassword(email);
 
   res.status(200).json({
     status: "success",

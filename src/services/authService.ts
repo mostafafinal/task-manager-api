@@ -9,10 +9,6 @@ export type RegisterUser = (data: IUser) => Promise<boolean | undefined>;
 
 export const registerUser: RegisterUser = async (userData) => {
   try {
-    const isExisted = await User.checkUserByEmail(userData.email);
-
-    if (isExisted) throw new Error("user is already existed, try to login");
-
     const hashedPassword = await hashPassword(userData.password);
 
     const createdUser = await User.create({
