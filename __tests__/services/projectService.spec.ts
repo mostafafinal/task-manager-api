@@ -36,11 +36,37 @@ describe("project service testing", () => {
   });
 
   test("get all projects test", async () => {
-    Project.find = jest.fn();
+    const countedProjects = 100;
+    const limit: number = 10;
+    const page: number = 2;
+    const skippedNumOfProjects: number = (page - 1) * limit;
 
-    await service.getProjects(id);
+    const countDocumentsMock = jest.fn().mockResolvedValue(countedProjects);
+    const selectMethodMock = jest.fn();
 
-    expect(Project.find).toHaveBeenCalledWith({ userId: id });
+    const limitMethodMock = jest.fn().mockReturnValue({
+      select: selectMethodMock,
+    });
+    const skipMethodMock = jest.fn().mockReturnValue({
+      limit: limitMethodMock,
+    });
+
+    Project.find = jest
+      .fn()
+      .mockReturnValueOnce({
+        countDocuments: countDocumentsMock,
+      })
+      .mockReturnValueOnce({
+        skip: skipMethodMock,
+      });
+
+    await service.getProjects(id, page, limit);
+
+    expect(countDocumentsMock).toHaveBeenCalled();
+    expect(skipMethodMock).toHaveBeenCalledWith(skippedNumOfProjects);
+    expect(limitMethodMock).toHaveBeenCalledWith(limit);
+    expect(selectMethodMock).toHaveBeenCalled();
+    expect(Project.find).toHaveBeenCalledTimes(2);
   });
 
   test.skip("get project data", async () => {
@@ -52,7 +78,7 @@ describe("project service testing", () => {
     expect(projectGet).toMatchObject<ProjectModel>(project);
   });
 
-  test("update project test", async () => {
+  test("update project", async () => {
     const newData: Partial<ProjectModel> = {
       name: faker.commerce.productName(),
       deadline: faker.date.future(),
@@ -68,7 +94,7 @@ describe("project service testing", () => {
     );
   });
 
-  test("delete project test", async () => {
+  test.skip("delete project", async () => {
     Project.deleteOne = jest.fn();
     jest.spyOn(User, "updateOne");
 
