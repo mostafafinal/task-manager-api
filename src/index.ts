@@ -3,10 +3,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import authRouter from "./routes/authRouter";
-import projectRouter from "./routes/projectRouter";
-import taskRouter from "./routes/taskRouter";
-import userRouter from "./routes/userRouter";
+import indexRouter from "./routes/indexRouter";
 import "./configs/passport";
 import "./configs/agenda";
 import { errorHandler } from "./middlewares/errorHandler";
@@ -31,15 +28,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: false }));
 
-// Root endpoint
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.use("/auth", authRouter);
-app.use("/user", userRouter);
-app.use("/projects", projectRouter);
-app.use("/tasks", taskRouter);
+app.use("/", indexRouter);
 
 // Error handling middleware
 app.use(errorHandler);
