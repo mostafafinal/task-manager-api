@@ -39,15 +39,17 @@ describe("Project controller testing", () => {
   test("get projects request", async () => {
     (service.getProjects as jest.Mock) = jest
       .fn()
-      .mockResolvedValue([project, project]);
+      .mockResolvedValue({ projects: "projectsMock", pages: "pagesMock" });
 
     const res: Response = await request(app)
       .get("/projects")
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
+      .query({ page: "1", limit: "10" });
 
     expect(service.getProjects).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
     expect(res.body.data).toBeDefined();
+    expect(res.body.data.pages).toBeDefined();
   });
 
   test("get project by id request", async () => {
@@ -85,7 +87,7 @@ describe("Project controller testing", () => {
   });
 
   test("delete project request", async () => {
-    (service.deleteProject as jest.Mock) = jest.fn().mockResolvedValue(null);
+    (service.deleteProject as jest.Mock) = jest.fn().mockResolvedValue(true);
 
     const res: Response = await request(app)
       .delete(`/projects/${id}`)
