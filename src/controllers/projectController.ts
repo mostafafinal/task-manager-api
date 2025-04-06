@@ -30,12 +30,16 @@ export const createProjectPost: RegularMiddlewareWithoutNext = async (
 };
 
 export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
-  const { page, limit } = req.params;
+  const { page, limit } = req.query;
 
   if (page === "" || limit === "")
     throw customError("fail", 400, "invalid projects query!");
 
-  const projects = await service.getProjects(req.user?.id, +page, +limit);
+  const projects = await service.getProjects(
+    req.user?.id,
+    page as undefined,
+    limit as undefined
+  );
 
   if (!projects) throw customError();
 
