@@ -9,6 +9,10 @@ export type RegisterUser = (data: IUser) => Promise<boolean | undefined>;
 
 export const registerUser: RegisterUser = async (userData) => {
   try {
+    const isExisted = await User.checkUserByEmail(userData.email);
+
+    if (isExisted) throw new Error("user is already existed, try to login");
+
     const hashedPassword = await hashPassword(userData.password);
 
     const createdUser = await User.create({
@@ -50,6 +54,8 @@ export const forgetPassword: ForgetPassword = async (userEmail) => {
     if (!userEmail) throw new Error("user email's not provided");
 
     const userId = await User.findOne({ email: userEmail }).select("_id");
+
+    if (!userId) throw new Error("user's not existed!");
 
     const token = await generateToken(
       { id: userId },

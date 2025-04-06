@@ -1,5 +1,4 @@
 import { body, ValidationChain } from "express-validator";
-import { User } from "../models/User";
 
 const errMsg = {
   fnLs: {
@@ -50,13 +49,7 @@ export const signUp: ValidationChain[] = [
     .withMessage(errMsg.email.empty)
     .bail()
     .isEmail()
-    .withMessage(errMsg.email)
-    .bail()
-    .custom(async (value) => {
-      const isExisted = await User.checkUserByEmail(value);
-
-      if (isExisted) throw new Error(errMsg.email.exist);
-    })
+    .withMessage(errMsg.email.valid)
     .bail()
     .escape(),
   body("password")
@@ -110,11 +103,5 @@ export const email: ValidationChain = body("email")
   .bail()
   .isEmail()
   .withMessage(errMsg.email)
-  .bail()
-  .custom(async (value) => {
-    const existed = await User.checkUserByEmail(value);
-
-    if (!existed) throw new Error(errMsg.email.notExisted);
-  })
   .bail()
   .escape();
