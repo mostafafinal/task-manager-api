@@ -33,7 +33,7 @@ export type GetProjects = (
   userId: Types.ObjectId,
   page: number,
   limit: number
-) => Promise<ProjectModel[] | undefined>;
+) => Promise<{ projects: ProjectModel[]; pages: number } | undefined>;
 
 export const getProjects = async (
   userId: Types.ObjectId,
