@@ -1,13 +1,15 @@
 import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
 import { IUser } from "../types/schemas";
 import * as service from "../services/userService";
-import { Types } from "mongoose";
-import { ObjectId } from "mongodb";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
 
 export const getUserGet: RegularMiddlewareWithoutNext = async (req, res) => {
-  const id: Types.ObjectId = ObjectId.createFromHexString(req.user?.id);
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const id = matchedData(req).userId;
 
   const user: Partial<IUser> | undefined = await service.getUserById(id);
 
@@ -26,10 +28,8 @@ export const changePasswordPut: RegularMiddlewareWithoutNext = async (
 
   const data = matchedData(req);
 
-  const id: Types.ObjectId = ObjectId.createFromHexString(req.user?.id);
-
   const serviceResult = await service.changeUserPassword(
-    id,
+    data.userId,
     data.oldPassword,
     data.newPassword
   );
@@ -71,7 +71,7 @@ export const deleteUserDelete: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  const id: Types.ObjectId = ObjectId.createFromHexString(req.user?.id);
+  const id = matchedData(req).userId;
 
   const serviceResult = await service.deleteUserById(id);
 

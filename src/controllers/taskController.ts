@@ -1,6 +1,5 @@
 import * as service from "../services/taskService";
 import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
-import { ObjectId } from "mongodb";
 import { TaskModel } from "../types/schemas";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
@@ -16,7 +15,6 @@ export const createTaskPost: RegularMiddlewareWithoutNext = async (
 
   const task: TaskModel = {
     ...data,
-    userId: req.user?.id,
   };
 
   const createdTask: TaskModel | undefined = await service.createTask(task);
@@ -35,11 +33,10 @@ export const getTaskGet: RegularMiddlewareWithoutNext = async (req, res) => {
 
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const params = matchedData(req);
+  const data = matchedData(req);
+  delete data.userId;
 
-  const taskId = ObjectId.createFromHexString(params.id);
-
-  const task: TaskModel | undefined = await service.getTask(taskId);
+  const task: TaskModel | undefined = await service.getTask(data.id);
 
   if (!task) throw customError();
 
@@ -55,8 +52,9 @@ export const updateTaskPost: RegularMiddlewareWithoutNext = async (
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
+  delete data.userId;
 
-  const taskId = ObjectId.createFromHexString(data.id);
+  const taskId = data.id;
   delete data.id;
 
   const serviceResult = await service.updateTask(taskId, data);
@@ -77,16 +75,11 @@ export const deleteTaskPost: RegularMiddlewareWithoutNext = async (
 
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const params = matchedData(req);
+  const id = matchedData(req).id;
 
-  const taskId = ObjectId.createFromHexString(params.id);
-
-  const serviceResult = await service.deleteTask(taskId);
+  const serviceResult = await service.deleteTask(id);
 
   if (!serviceResult) throw customError();
 
-  res.status(204).json({
-    status: "success",
-    message: "task deleted successfully",
-  });
+  res.status(204).end();
 };

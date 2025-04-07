@@ -4,6 +4,7 @@ import isAuth from "../middlewares/isAuth";
 import { tryCatch } from "../utils/tryCatch";
 import { signToken } from "../middlewares/jwt";
 import * as validate from "../validators/authValidator";
+import { validateUserId } from "../validators/objectIdValidator";
 
 const authRouter: Router = Router();
 
@@ -30,6 +31,11 @@ authRouter.post(
   tryCatch(controller.forgetPasswordPost)
 );
 
-authRouter.delete("/logout", isAuth, tryCatch(controller.logout));
+authRouter.delete(
+  "/logout",
+  isAuth,
+  validateUserId,
+  tryCatch(controller.logout)
+);
 
 export default authRouter;

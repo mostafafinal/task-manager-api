@@ -1,6 +1,5 @@
 import * as service from "../services/projectService";
 import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
-import { ObjectId } from "mongodb";
 import { ProjectModel } from "../types/schemas";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
@@ -17,7 +16,6 @@ export const createProjectPost: RegularMiddlewareWithoutNext = async (
 
   const project: ProjectModel = {
     ...data,
-    userId: req.user?.id,
   };
 
   const createdProject: ProjectModel | undefined =
@@ -38,13 +36,12 @@ export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
 
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const query = matchedData(req);
-  console.log(query);
+  const data = matchedData(req);
 
   const projects = await service.getProjects(
-    req.user?.id,
-    query.page,
-    query.limit
+    data.userId,
+    data.page,
+    data.limit
   );
 
   if (!projects) throw customError();
@@ -60,11 +57,9 @@ export const getProject: RegularMiddlewareWithoutNext = async (req, res) => {
 
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const params = matchedData(req);
+  const data = matchedData(req);
 
-  const projectId = ObjectId.createFromHexString(params.id);
-
-  const project: ProjectModel | undefined = await service.getProject(projectId);
+  const project: ProjectModel | undefined = await service.getProject(data.id);
 
   if (!project) throw customError("fail", 404, "project not found!");
 
@@ -80,8 +75,9 @@ export const updateProjectPost: RegularMiddlewareWithoutNext = async (
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
+  delete data.userId;
 
-  const projectId = ObjectId.createFromHexString(data.id);
+  const projectId = data.id;
   delete data.id;
 
   const newData: Partial<ProjectModel> = {
@@ -106,17 +102,11 @@ export const deleteProjectPost: RegularMiddlewareWithoutNext = async (
 
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const params = matchedData(req);
+  const data = matchedData(req);
 
-  const userId = ObjectId.createFromHexString(req.user?.id);
-  const projectId = ObjectId.createFromHexString(params.id);
-
-  const serviceResult = await service.deleteProject(projectId, userId);
+  const serviceResult = await service.deleteProject(data.id, data.userId);
 
   if (!serviceResult) throw customError();
 
-  res.status(204).json({
-    status: "success",
-    message: "project deleted successfully",
-  });
+  res.status(204).end();
 };

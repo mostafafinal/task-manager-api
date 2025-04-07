@@ -3,10 +3,11 @@ import * as controller from "../controllers/projectController";
 import isAuth from "../middlewares/isAuth";
 import { tryCatch } from "../utils/tryCatch";
 import * as validate from "../validators/projectValidator";
+import * as objectId from "../validators/objectIdValidator";
 
 const projectRouter: Router = Router();
 
-projectRouter.use(isAuth);
+projectRouter.use(isAuth, objectId.validateUserId);
 
 projectRouter
   .route("/")
@@ -15,12 +16,12 @@ projectRouter
 
 projectRouter
   .route("/:id")
-  .get(validate.paramId, tryCatch(controller.getProject))
+  .get(objectId.validateParamId, tryCatch(controller.getProject))
   .put(
-    validate.paramId,
+    objectId.validateParamId,
     validate.newData,
     tryCatch(controller.updateProjectPost)
   )
-  .delete(validate.paramId, tryCatch(controller.deleteProjectPost));
+  .delete(objectId.validateParamId, tryCatch(controller.deleteProjectPost));
 
 export default projectRouter;
