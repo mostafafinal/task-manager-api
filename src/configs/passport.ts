@@ -35,6 +35,9 @@ const googleVerifyCallback: GoogleVerifyCB = async (
   done
 ) => {
   try {
+    if (!profile.email)
+      throw new Error("email's not provided from the profile!");
+
     const user = await User.findOne({ email: profile.email });
 
     if (!user) {
@@ -70,14 +73,16 @@ const verifyUserCredientials: VerifyFunction = async (
 ) => {
   try {
     const user = await loginUser({ email: username, password: password });
+    if (!username || !password)
+      throw new Error("email or password is not provided");
 
     if (!user) {
       return done(null, false);
     }
 
     return done(null, user);
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    done(error, false);
   }
 };
 
@@ -93,6 +98,8 @@ const jwtOpts: StrategyOptionsWithoutRequest = {
 
 const verifyUserFromToken: VerifyCallback = async (payload, done) => {
   try {
+    if (!payload.id || payload.id.length !== 24) return done(null, false);
+
     const user = await User.findOne({ _id: payload.id });
 
     if (!user) return done(null, false);
