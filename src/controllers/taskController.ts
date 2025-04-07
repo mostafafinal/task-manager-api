@@ -3,22 +3,25 @@ import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
 import { ObjectId } from "mongodb";
 import { TaskModel } from "../types/schemas";
 import { customError } from "../utils/customError";
+import { matchedData, validationResult } from "express-validator";
 
 export const createTaskPost: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  if (!req.body || Object.keys(req.body).length <= 0)
-    throw customError("fail", 400, "invalid task data");
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const data = matchedData<TaskModel>(req);
 
   const task: TaskModel = {
-    ...req.body,
+    ...data,
     userId: req.user?.id,
   };
 
   const createdTask: TaskModel | undefined = await service.createTask(task);
 
-  if (createdTask) throw customError();
+  if (!createdTask) throw customError();
 
   res.status(201).json({
     status: "success",
@@ -28,10 +31,13 @@ export const createTaskPost: RegularMiddlewareWithoutNext = async (
 };
 
 export const getTaskGet: RegularMiddlewareWithoutNext = async (req, res) => {
-  if (!req.params.id || req.params.id.length !== 24)
-    throw customError("fail", 400, "invalid task credentials");
+  const errors = validationResult(req);
 
-  const taskId = ObjectId.createFromHexString(req.params.id);
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const params = matchedData(req);
+
+  const taskId = ObjectId.createFromHexString(params.id);
 
   const task: TaskModel | undefined = await service.getTask(taskId);
 
@@ -44,18 +50,16 @@ export const updateTaskPost: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  if (!req.params.id || req.params.id.length !== 24)
-    throw customError("fail", 400, "invalid task credentials");
+  const errors = validationResult(req);
 
-  if (!req.body || Object.keys(req.body).length <= 0)
-    throw customError("fail", 400, "invalid task data");
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const newData: Partial<TaskModel> = {
-    ...req.body,
-  };
-  const taskId = ObjectId.createFromHexString(req.params.id);
+  const data = matchedData(req);
 
-  const serviceResult = await service.updateTask(taskId, newData);
+  const taskId = ObjectId.createFromHexString(data.id);
+  delete data.id;
+
+  const serviceResult = await service.updateTask(taskId, data);
 
   if (!serviceResult) throw customError();
 
@@ -69,10 +73,13 @@ export const deleteTaskPost: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  if (!req.params.id || req.params.id.length !== 24)
-    throw customError("fail", 400, "invalid task credentials");
+  const errors = validationResult(req);
 
-  const taskId = ObjectId.createFromHexString(req.params.id);
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const params = matchedData(req);
+
+  const taskId = ObjectId.createFromHexString(params.id);
 
   const serviceResult = await service.deleteTask(taskId);
 
