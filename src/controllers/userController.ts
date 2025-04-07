@@ -4,6 +4,7 @@ import * as service from "../services/userService";
 import { Types } from "mongoose";
 import { ObjectId } from "mongodb";
 import { customError } from "../utils/customError";
+import { matchedData, validationResult } from "express-validator";
 
 export const getUserGet: RegularMiddlewareWithoutNext = async (req, res) => {
   const id: Types.ObjectId = ObjectId.createFromHexString(req.user?.id);
@@ -19,15 +20,18 @@ export const changePasswordPut: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  if (!req.body.oldPassword || !req.body.newPassword)
-    throw customError("fail", 400, "either new/old password is not provided!");
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const data = matchedData(req);
 
   const id: Types.ObjectId = ObjectId.createFromHexString(req.user?.id);
 
   const serviceResult = await service.changeUserPassword(
     id,
-    req.body.oldPassword,
-    req.body.newPassword
+    data.oldPassword,
+    data.newPassword
   );
 
   if (!serviceResult)
@@ -43,12 +47,15 @@ export const resetPasswordPut: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  if (!req.body.newPassword)
-    throw customError("fail", 400, "new password is not provided!");
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const data = matchedData(req);
 
   const serviceResult = await service.resetUserPassword(
-    req.params.token,
-    req.body.newPassword
+    data.token,
+    data.newPassword
   );
 
   if (!serviceResult)
