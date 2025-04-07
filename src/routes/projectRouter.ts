@@ -1,7 +1,8 @@
 import { Router } from "express";
-import * as projectController from "../controllers/projectController";
+import * as controller from "../controllers/projectController";
 import isAuth from "../middlewares/isAuth";
 import { tryCatch } from "../utils/tryCatch";
+import * as validate from "../validators/projectValidator";
 
 const projectRouter: Router = Router();
 
@@ -9,13 +10,17 @@ projectRouter.use(isAuth);
 
 projectRouter
   .route("/")
-  .get(tryCatch(projectController.getProjects))
-  .post(tryCatch(projectController.createProjectPost));
+  .get(validate.pagination, tryCatch(controller.getProjects))
+  .post(validate.newProject, tryCatch(controller.createProjectPost));
 
 projectRouter
   .route("/:id")
-  .get(tryCatch(projectController.getProject))
-  .put(tryCatch(projectController.updateProjectPost))
-  .delete(tryCatch(projectController.deleteProjectPost));
+  .get(validate.paramId, tryCatch(controller.getProject))
+  .put(
+    validate.paramId,
+    validate.newData,
+    tryCatch(controller.updateProjectPost)
+  )
+  .delete(validate.paramId, tryCatch(controller.deleteProjectPost));
 
 export default projectRouter;

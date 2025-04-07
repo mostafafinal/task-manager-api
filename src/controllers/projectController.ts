@@ -3,16 +3,20 @@ import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
 import { ObjectId } from "mongodb";
 import { ProjectModel } from "../types/schemas";
 import { customError } from "../utils/customError";
+import { matchedData, validationResult } from "express-validator";
 
 export const createProjectPost: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  if (!req.body || Object.keys(req.body).length <= 0)
-    throw customError("fail", 400, "invalid project data");
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const data = matchedData<ProjectModel>(req);
 
   const project: ProjectModel = {
-    ...req.body,
+    ...data,
     userId: req.user?.id,
   };
 
@@ -30,15 +34,17 @@ export const createProjectPost: RegularMiddlewareWithoutNext = async (
 };
 
 export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
-  const { page, limit } = req.query;
+  const errors = validationResult(req);
 
-  if (page === "" || limit === "")
-    throw customError("fail", 400, "invalid projects query!");
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const query = matchedData(req);
+  console.log(query);
 
   const projects = await service.getProjects(
     req.user?.id,
-    page as undefined,
-    limit as undefined
+    query.page,
+    query.limit
   );
 
   if (!projects) throw customError();
@@ -50,10 +56,13 @@ export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
 };
 
 export const getProject: RegularMiddlewareWithoutNext = async (req, res) => {
-  if (!req.params.id || req.params.id.length !== 24)
-    throw customError("fail", 400, "invalid project credentials!");
+  const errors = validationResult(req);
 
-  const projectId = ObjectId.createFromHexString(req.params.id);
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const params = matchedData(req);
+
+  const projectId = ObjectId.createFromHexString(params.id);
 
   const project: ProjectModel | undefined = await service.getProject(projectId);
 
@@ -66,13 +75,17 @@ export const updateProjectPost: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  if (!req.params.id || req.params.id.length !== 24)
-    throw customError("fail", 400, "invalid project credentials!");
+  const errors = validationResult(req);
 
-  const projectId = ObjectId.createFromHexString(req.params.id);
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const data = matchedData(req);
+
+  const projectId = ObjectId.createFromHexString(data.id);
+  delete data.id;
 
   const newData: Partial<ProjectModel> = {
-    ...req.body,
+    ...data,
   };
 
   const serviceResult = await service.updateProject(projectId, newData);
@@ -89,16 +102,14 @@ export const deleteProjectPost: RegularMiddlewareWithoutNext = async (
   req,
   res
 ) => {
-  if (
-    !req.user?.id ||
-    !req.params.id ||
-    req.user?.id.length !== 24 ||
-    req.params.id.length != 24
-  )
-    throw customError("fail", 400, "invalid user or project credentials");
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const params = matchedData(req);
 
   const userId = ObjectId.createFromHexString(req.user?.id);
-  const projectId = ObjectId.createFromHexString(req.params.id);
+  const projectId = ObjectId.createFromHexString(params.id);
 
   const serviceResult = await service.deleteProject(projectId, userId);
 
