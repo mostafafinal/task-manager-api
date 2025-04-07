@@ -1,4 +1,4 @@
-import { body, param, query, ValidationChain } from "express-validator";
+import { body, query, ValidationChain } from "express-validator";
 
 const errMsg = {
   project: {
@@ -98,12 +98,6 @@ export const pagination: ValidationChain[] = [
     .escape()
     .optional(),
 ];
-
-export const paramId: ValidationChain = param("id")
-  .isMongoId()
-  .withMessage(errMsg.param)
-  .bail()
-  .escape();
 
 export const newData: ValidationChain[] = [
   body("name")

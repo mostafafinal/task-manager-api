@@ -1,4 +1,4 @@
-import { body, param, ValidationChain } from "express-validator";
+import { body, ValidationChain } from "express-validator";
 
 const errMsg = {
   task: {
@@ -88,12 +88,6 @@ export const newtask: ValidationChain[] = [
     .bail()
     .escape(),
 ];
-
-export const paramId: ValidationChain = param("id")
-  .isMongoId()
-  .withMessage(errMsg.param)
-  .bail()
-  .escape();
 
 export const newData: ValidationChain[] = [
   body("name")
