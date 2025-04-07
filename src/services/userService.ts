@@ -33,15 +33,15 @@ export const changeUserPassword = async (
     if (!userId || !oldPassword || !newPassword)
       throw new Error("either user id or old/new password is not provided");
 
-    const userPassword: Partial<IUser> | null =
+    const user: Partial<IUser> | null =
       await User.findById(userId).select("password");
 
-    if (!(await bcrypt.verifyPassword(oldPassword, userPassword as string)))
+    if (!(await bcrypt.verifyPassword(oldPassword, user?.password as string)))
       throw new Error("current password's incorrect!");
 
     const newHashedPassword: string = await bcrypt.hashPassword(newPassword);
 
-    if (await bcrypt.verifyPassword(newPassword, userPassword as string))
+    if (await bcrypt.verifyPassword(newPassword, user?.password as string))
       throw new Error("user password's already the same!");
 
     const result = await User.updateOne(
