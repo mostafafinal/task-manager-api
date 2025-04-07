@@ -69,13 +69,16 @@ describe("project service testing", () => {
     expect(Project.find).toHaveBeenCalledTimes(2);
   });
 
-  test.skip("get project data", async () => {
-    Project.findById = jest.fn().mockResolvedValue(project);
+  test("get project data", async () => {
+    const populateMethodMock = jest.fn();
+    Project.findById = jest.fn().mockReturnValue({
+      populate: populateMethodMock,
+    });
 
-    const projectGet: ProjectModel | undefined = await service.getProject(id);
+    await service.getProject(id);
 
-    expect(Project.findById).toHaveBeenLastCalledWith(id);
-    expect(projectGet).toMatchObject<ProjectModel>(project);
+    expect(Project.findById).toHaveBeenCalledWith(id);
+    expect(populateMethodMock).toHaveBeenCalled();
   });
 
   test("update project", async () => {
@@ -84,7 +87,7 @@ describe("project service testing", () => {
       deadline: faker.date.future(),
     };
 
-    Project.updateOne = jest.fn();
+    Project.updateOne = jest.fn().mockResolvedValue(true);
 
     await service.updateProject(id, newData);
 
@@ -94,8 +97,8 @@ describe("project service testing", () => {
     );
   });
 
-  test.skip("delete project", async () => {
-    Project.deleteOne = jest.fn();
+  test("delete project", async () => {
+    Project.deleteOne = jest.fn().mockResolvedValue(true);
     jest.spyOn(User, "updateOne");
 
     agenda.now = jest.fn();
@@ -104,8 +107,6 @@ describe("project service testing", () => {
 
     expect(Project.deleteOne).toHaveBeenCalledWith({ _id: id });
     expect(User.updateOne).toHaveBeenCalled();
-    expect(agenda.now).toHaveBeenLastCalledWith("delete project tasks", {
-      projectId: id,
-    });
+    expect(agenda.now).toHaveBeenCalledWith("delete project tasks", id);
   });
 });

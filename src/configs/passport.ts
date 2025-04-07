@@ -17,10 +17,10 @@ import {
 } from "passport-jwt";
 import { loginUser } from "../services/authService";
 import { User } from "../models/User";
-import dotenv from "dotenv";
+import { config } from "dotenv";
 import { IUser } from "../types/schemas";
 
-dotenv.config();
+config();
 
 const googleOpts: StrategyOptions = {
   clientID: process.env.GOOGLE_CLIENT_ID as string,

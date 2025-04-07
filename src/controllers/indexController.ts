@@ -1,6 +1,6 @@
 import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
 
-export const greeting: RegularMiddlewareWithoutNext = async (req, res) => {
+export const launch: RegularMiddlewareWithoutNext = async (req, res) => {
   res.send("Hi, I'm working!");
 };
 

@@ -8,7 +8,7 @@ import { tryCatch } from "../utils/tryCatch";
 
 const indexRouter = Router();
 
-indexRouter.get("/", tryCatch(controller.greeting));
+indexRouter.get("/", tryCatch(controller.launch));
 
 indexRouter.use("/auth", authRouter);
 indexRouter.use("/projects", projectRouter);

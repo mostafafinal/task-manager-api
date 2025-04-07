@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as controller from "../controllers/authController";
 import isAuth from "../middlewares/isAuth";
 import { tryCatch } from "../utils/tryCatch";
-import { signToken } from "../middlewares/jwt";
+import { assignToken } from "../middlewares/jwt";
 import * as validate from "../validators/authValidator";
 import { validateUserId } from "../validators/objectIdValidator";
 
@@ -14,7 +14,8 @@ authRouter.post(
   "/login",
   validate.login,
   controller.loginLocal,
-  tryCatch(signToken)
+  validateUserId,
+  tryCatch(assignToken)
 );
 
 authRouter.get("/google", controller.loginGoogle);
@@ -22,7 +23,7 @@ authRouter.get("/google", controller.loginGoogle);
 authRouter.get(
   "/google/callback",
   controller.loginGoogleCB,
-  tryCatch(signToken)
+  tryCatch(assignToken)
 );
 
 authRouter.post(

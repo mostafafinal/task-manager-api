@@ -15,7 +15,7 @@ export const getUserGet: RegularMiddlewareWithoutNext = async (req, res) => {
 
   if (!user) throw customError("fail", 404, "user is not found!");
 
-  res.status(200).json({ user: user });
+  res.status(200).json({ status: "success", user: user });
 };
 
 export const changePasswordPut: RegularMiddlewareWithoutNext = async (

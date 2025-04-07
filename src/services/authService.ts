@@ -2,7 +2,7 @@ import { User } from "../models/User";
 import { hashPassword, verifyPassword } from "../utils/bcryption";
 import { IUser } from "../types/schemas";
 import { generateToken } from "../utils/token";
-import { Secret } from "jsonwebtoken";
+import { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 import { resetPasswordEmail } from "../utils/mail";
 
 export type RegisterUser = (data: IUser) => Promise<boolean | undefined>;
@@ -30,7 +30,7 @@ type LoginUser = (data: Partial<IUser>) => Promise<IUser | undefined>;
 
 export const loginUser: LoginUser = async (userData) => {
   try {
-    const user = await User.getUser(userData.email as string);
+    const user = await User.findOne({ email: userData.email });
 
     if (!user) throw new Error("User is not existed");
 
@@ -57,10 +57,14 @@ export const forgetPassword: ForgetPassword = async (userEmail) => {
 
     if (!userId) throw new Error("user's not existed!");
 
-    const token = await generateToken(
-      { id: userId },
-      process.env.JWT_SECRET as Secret
-    );
+    const payload: JwtPayload = { id: userId };
+    const secret = process.env.JWT_SECRET as Secret;
+    const options: SignOptions = {
+      algorithm: "HS256",
+      expiresIn: "5d",
+    };
+
+    const token = await generateToken(payload, secret, options);
 
     const domain: string = `${process.env.REDIRECT_DOMAIN}/user/resetpassword/${token}`;
 

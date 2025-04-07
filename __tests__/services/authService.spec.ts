@@ -48,7 +48,7 @@ describe("User Authentication Test", () => {
   });
 
   test("User Login Test", async () => {
-    User.getUser = jest.fn().mockReturnValue(user);
+    User.findOne = jest.fn().mockReturnValue(user);
 
     (verifyPassword as jest.Mock).mockResolvedValue(true);
 

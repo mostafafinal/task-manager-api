@@ -39,8 +39,7 @@ export const newProject: ValidationChain[] = [
     .bail()
     .isLength({ min: 2, max: 100 })
     .withMessage(errMsg.project.name.length)
-    .bail()
-    .escape(),
+    .bail(),
   body("status")
     .notEmpty()
     .trim()
@@ -72,8 +71,7 @@ export const newProject: ValidationChain[] = [
     .isLength({ max: 1000 })
     .withMessage(errMsg.project.description.length)
     .bail()
-    .optional()
-    .escape(),
+    .optional(),
 ];
 
 export const pagination: ValidationChain[] = [
@@ -108,8 +106,7 @@ export const newData: ValidationChain[] = [
     .isLength({ min: 2, max: 100 })
     .withMessage(errMsg.project.name.length)
     .bail()
-    .optional()
-    .escape(),
+    .optional(),
   body("status")
     .notEmpty()
     .trim()
@@ -144,6 +141,5 @@ export const newData: ValidationChain[] = [
     .isLength({ max: 1000 })
     .withMessage(errMsg.project.description.length)
     .bail()
-    .optional()
-    .escape(),
+    .optional(),
 ];

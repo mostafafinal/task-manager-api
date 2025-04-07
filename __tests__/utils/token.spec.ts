@@ -1,4 +1,4 @@
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 import * as token from "../../src/utils/token";
 
 describe("Token util suite", () => {
@@ -8,13 +8,21 @@ describe("Token util suite", () => {
   const payloadMock: JwtPayload = {
     id: "mock-id",
   };
+  const optionMock: SignOptions = {
+    algorithm: "HS256",
+    expiresIn: "5m",
+  };
 
   test("generate token", async () => {
     jest.spyOn(jwt, "sign").mockResolvedValue("token-mock" as never);
 
-    const generatedToken = await token.generateToken(payloadMock, secretMock);
+    const generatedToken = await token.generateToken(
+      payloadMock,
+      secretMock,
+      optionMock
+    );
 
-    expect(jwt.sign).toHaveBeenCalled();
+    expect(jwt.sign).toHaveBeenCalledWith(payloadMock, secretMock, optionMock);
     expect(generatedToken).toBe("token-mock");
   });
 

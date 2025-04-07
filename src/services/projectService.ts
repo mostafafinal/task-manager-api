@@ -43,15 +43,15 @@ export const getProjects = async (
   try {
     if (!userId) throw new Error("Service: user's id's not provided");
 
-    const startIndex: number = (+page - 1) * +limit;
+    const startIndex: number = (page - 1) * limit;
     const totalProjects: number = await Project.find({
       userId: userId,
     }).countDocuments();
-    const paginations: number = Math.ceil(totalProjects / +limit);
+    const paginations: number = Math.ceil(totalProjects / limit);
 
     const projects = await Project.find({ userId: userId })
       .skip(startIndex)
-      .limit(+limit)
+      .limit(limit)
       .select(["name", "deadline", "priority", "status"]);
 
     return { projects: projects, pages: paginations };

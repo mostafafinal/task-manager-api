@@ -1,13 +1,11 @@
-import request from 'supertest';
-import app from '../src/index';
+import request from "supertest";
+import app from "../src/index";
 
-describe('GET /', () => {
-  it("should indicate that the server's working with greeting message", async () => {
-    const res = await request(app)
-      .get('/')
-      .expect('Content-Type', /json/)
-      .expect(200);
+describe("App suite", () => {
+  test("app launch request", async () => {
+    const res = await request(app).get("/");
 
-    expect(res.body.message).toBe('Hello World!');
+    expect(res.status).toEqual(200);
+    expect(res.text).toBe("Hi, I'm working!");
   });
 });

@@ -24,6 +24,7 @@ describe("task service testing", () => {
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
     projectId: new Types.ObjectId(faker.database.mongodbObjectId()),
+    userId: id,
   };
 
   afterEach(() => jest.clearAllMocks);
@@ -53,7 +54,7 @@ describe("task service testing", () => {
       deadline: faker.date.future(),
     };
 
-    Task.updateOne = jest.fn();
+    Task.updateOne = jest.fn().mockResolvedValue(true);
 
     await updateTask(id, newData);
 

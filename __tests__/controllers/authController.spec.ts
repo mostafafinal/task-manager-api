@@ -1,26 +1,28 @@
 import request from "supertest";
 import app from "../../src/index";
 import { faker } from "@faker-js/faker";
-import { IUser } from "../../src/types/schemas";
 import * as authService from "../../src/services/authService";
 
+jest.mock("../../src/services/authService");
+
 describe("authentication controller suite", () => {
-  const user: IUser = {
+  const user = {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
     email: faker.internet.email(),
-    password: faker.internet.password(),
+    password: "35335TwtwEW4#@1",
   };
 
   afterEach(() => jest.clearAllMocks());
 
   test("register new user request", async () => {
-    jest.spyOn(authService, "registerUser");
+    jest.spyOn(authService, "registerUser").mockResolvedValue(true);
 
     const res = await request(app)
       .post("/auth/register")
       .send({
         ...user,
+        confirmPassword: user.password,
       });
 
     expect(authService.registerUser).toHaveBeenCalledWith(user);

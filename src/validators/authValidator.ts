@@ -32,7 +32,6 @@ export const signUp: ValidationChain[] = [
     .bail()
     .isLength({ min: 2, max: 10 })
     .withMessage(errMsg.fnLs.length)
-    .escape()
     .bail(),
   body("lastName")
     .notEmpty()
@@ -41,8 +40,7 @@ export const signUp: ValidationChain[] = [
     .bail()
     .isLength({ min: 2, max: 10 })
     .withMessage(errMsg.fnLs.length)
-    .bail()
-    .escape(),
+    .bail(),
   body("email")
     .notEmpty()
     .trim()
@@ -62,8 +60,7 @@ export const signUp: ValidationChain[] = [
     .bail()
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])/)
     .withMessage(errMsg.password.safe)
-    .bail()
-    .escape(),
+    .bail(),
   body("confirmPassword")
     .notEmpty()
     .trim()
@@ -71,8 +68,7 @@ export const signUp: ValidationChain[] = [
     .bail()
     .custom((value, { req }) => value === req.body.password)
     .withMessage(errMsg.confirmPassword.match)
-    .bail()
-    .escape(),
+    .bail(),
 ];
 
 export const login: ValidationChain[] = [
@@ -92,8 +88,7 @@ export const login: ValidationChain[] = [
     .bail()
     .isLength({ min: 8, max: 30 })
     .withMessage(errMsg.password.length)
-    .bail()
-    .escape(),
+    .bail(),
 ];
 
 export const email: ValidationChain = body("email")

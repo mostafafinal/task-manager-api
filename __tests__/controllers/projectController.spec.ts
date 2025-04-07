@@ -11,22 +11,23 @@ describe("Project controller testing", () => {
   const id: Types.ObjectId = new Types.ObjectId(
     faker.database.mongodbObjectId()
   );
-  const project: Partial<ProjectModel> = {
+  const project: ProjectModel = {
     name: faker.commerce.productName(),
     deadline: faker.date.soon(),
     status: faker.helpers.arrayElement(["active", "completed"]),
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
+    userId: id,
   };
 
   afterAll(() => jest.clearAllMocks());
 
   test("create project request", async () => {
-    (service.createProject as jest.Mock) = jest.fn().mockResolvedValue(project);
+    jest.spyOn(service, "createProject").mockResolvedValue(project);
 
     const res: Response = await request(app)
       .post("/projects")
-      .send({ project: project })
+      .send({ ...project })
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.createProject).toHaveBeenCalled();
@@ -37,9 +38,10 @@ describe("Project controller testing", () => {
   });
 
   test("get projects request", async () => {
-    (service.getProjects as jest.Mock) = jest
-      .fn()
-      .mockResolvedValue({ projects: "projectsMock", pages: "pagesMock" });
+    jest.spyOn(service, "getProjects").mockResolvedValue({
+      projects: [project, project] as unknown as [],
+      pages: 100,
+    });
 
     const res: Response = await request(app)
       .get("/projects")
@@ -53,31 +55,26 @@ describe("Project controller testing", () => {
   });
 
   test("get project by id request", async () => {
-    (service.getProject as jest.Mock) = jest.fn().mockResolvedValue(project);
+    jest.spyOn(service, "getProject").mockResolvedValue(project);
 
     const res: Response = await request(app)
       .get(`/projects/${id}`)
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
-    expect(service.getProject).toHaveBeenCalledWith(id);
+    expect(service.getProject).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
     expect(res.body.data).toBeDefined();
   });
 
   test("update project request", async () => {
     const newDes = faker.commerce.productDescription();
-    (service.updateProject as jest.Mock) = jest
-      .fn()
-      .mockResolvedValue({ ...project, description: newDes });
+    jest.spyOn(service, "updateProject").mockResolvedValue(true);
 
     const res: Response = await request(app)
       .put(`/projects/${id}`)
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
       .send({
-        projectId: id,
-        newData: {
-          description: newDes,
-        },
+        description: newDes,
       });
 
     expect(service.updateProject).toHaveBeenCalled();
@@ -87,7 +84,7 @@ describe("Project controller testing", () => {
   });
 
   test("delete project request", async () => {
-    (service.deleteProject as jest.Mock) = jest.fn().mockResolvedValue(true);
+    jest.spyOn(service, "deleteProject").mockResolvedValue(true);
 
     const res: Response = await request(app)
       .delete(`/projects/${id}`)

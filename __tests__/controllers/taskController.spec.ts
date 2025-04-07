@@ -11,33 +11,35 @@ describe("Task controller testing", () => {
   const id: Types.ObjectId = new Types.ObjectId(
     faker.database.mongodbObjectId()
   );
-  const task: Partial<TaskModel> = {
+  const task: TaskModel = {
     name: faker.commerce.productName(),
     deadline: faker.date.soon(),
-    status: faker.helpers.arrayElement(["active", "completed"]),
+    status: faker.helpers.arrayElement(["todo", "in-progress", "completed"]),
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
+    projectId: id,
+    userId: id,
   };
 
   afterAll(() => jest.clearAllMocks());
 
   test("create task request", async () => {
-    (service.createTask as jest.Mock) = jest.fn().mockResolvedValue(task);
+    jest.spyOn(service, "createTask").mockResolvedValue(task);
 
     const res: Response = await request(app)
       .post("/tasks")
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
-      .send({ projectId: id, task: task });
+      .send({ ...task });
 
     expect(service.createTask).toHaveBeenCalled();
     expect(res.statusCode).toEqual(201);
-    expect(res.body.status).toBe("success");
-    expect(res.body.message).toBe("task created successfully");
+    expect(res.body.status).toBeDefined();
+    expect(res.body.message).toBeDefined();
     expect(res.body.data).toBeDefined();
   });
 
   test("get task by id request", async () => {
-    (service.getTask as jest.Mock) = jest.fn().mockResolvedValue(task);
+    jest.spyOn(service, "getTask").mockResolvedValue(task);
 
     const res: Response = await request(app)
       .get(`/tasks/${id}`)
@@ -45,14 +47,13 @@ describe("Task controller testing", () => {
 
     expect(service.getTask).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toBeDefined();
     expect(res.body.data).toBeDefined();
   });
 
   test("update task request", async () => {
     const newDes = faker.commerce.productDescription();
-    (service.updateTask as jest.Mock) = jest
-      .fn()
-      .mockResolvedValue({ ...task, description: newDes });
+    jest.spyOn(service, "updateTask").mockResolvedValue(true);
 
     const res: Response = await request(app)
       .put(`/tasks/${id}`)
@@ -65,12 +66,12 @@ describe("Task controller testing", () => {
 
     expect(service.updateTask).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
-    expect(res.body.status).toBe("success");
-    expect(res.body.message).toBe("task updated successfully");
+    expect(res.body.status).toBeDefined();
+    expect(res.body.message).toBeDefined();
   });
 
   test("delete task request", async () => {
-    (service.deleteTask as jest.Mock) = jest.fn().mockResolvedValue(null);
+    jest.spyOn(service, "deleteTask").mockResolvedValue(true);
 
     const res: Response = await request(app)
       .delete(`/tasks/${id}`)

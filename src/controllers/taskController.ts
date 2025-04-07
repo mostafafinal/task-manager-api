@@ -9,6 +9,7 @@ export const createTaskPost: RegularMiddlewareWithoutNext = async (
   res
 ) => {
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
   const data = matchedData<TaskModel>(req);
@@ -40,7 +41,7 @@ export const getTaskGet: RegularMiddlewareWithoutNext = async (req, res) => {
 
   if (!task) throw customError();
 
-  res.status(200).json({ data: task });
+  res.status(200).json({ status: "success", data: task });
 };
 
 export const updateTaskPost: RegularMiddlewareWithoutNext = async (

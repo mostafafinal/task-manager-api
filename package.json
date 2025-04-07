@@ -7,7 +7,7 @@
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
     "db": "tsx -r dotenv/config src/populateDB.ts",
-    "test": "jest --forceExit",
+    "test": "PORT=0 jest --forceExit",
     "lint": "eslint 'src/**/*.{js,ts}' --fix",
     "lint:check": "eslint 'src/**/*.{js,ts}'",
     "format": "prettier --write 'src/**/*.{ts,js,json,md}'",

@@ -1,7 +1,7 @@
 import { Agenda } from "@hokify/agenda";
-import dotenv from "dotenv";
+import { config } from "dotenv";
 
-dotenv.config();
+config();
 
 const connectionOpts = {
   db: { address: process.env.MONGO_URL as string, collection: "agendaJobs" },

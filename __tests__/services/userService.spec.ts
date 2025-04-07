@@ -37,23 +37,27 @@ describe("User service suite", () => {
     process.env = originalEnv;
   });
 
-  test.skip("get user data", async () => {
-    User.findById = jest.fn().mockResolvedValue(user);
+  test("get user data", async () => {
+    const selectMethodMock = jest.fn().mockResolvedValue(user);
+    User.findById = jest.fn().mockReturnValue({
+      select: selectMethodMock,
+    });
 
     const userData: Partial<IUser> | undefined = await service.getUserById(id);
 
-    expect(User.findById).toHaveBeenCalledWith({ id: id });
+    expect(User.findById).toHaveBeenCalledWith({ _id: id });
+    expect(selectMethodMock).toHaveBeenCalled();
     expect(userData).toMatchObject<Partial<IUser>>(user);
   });
 
   test("change user password", async () => {
     const mockReturnedPassword = jest.fn().mockResolvedValue("12345678");
-
     (User.findById as jest.Mock).mockReturnValue({
       select: mockReturnedPassword,
     });
 
-    User.updateOne = jest.fn();
+    User.updateOne = jest.fn().mockResolvedValue(true);
+
     (bcrypt.verifyPassword as jest.Mock) = jest
       .fn()
       .mockResolvedValueOnce(true)
@@ -81,7 +85,7 @@ describe("User service suite", () => {
 
     jest.spyOn(token, "verifyToken").mockResolvedValue(payloadMock as never);
 
-    User.updateOne = jest.fn();
+    User.updateOne = jest.fn().mockResolvedValue(true);
 
     (bcrypt.hashPassword as jest.Mock) = jest
       .fn()
@@ -101,7 +105,7 @@ describe("User service suite", () => {
   });
 
   test("delete user", async () => {
-    User.deleteOne = jest.fn();
+    User.deleteOne = jest.fn().mockResolvedValue(true);
     jest.spyOn(agenda, "now");
 
     await service.deleteUserById(id);

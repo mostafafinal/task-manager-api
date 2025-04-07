@@ -1,22 +1,26 @@
-import { JwtPayload, sign, SignOptions } from "jsonwebtoken";
+import { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
 import { customError } from "../utils/customError";
+import { matchedData, validationResult } from "express-validator";
+import { generateToken } from "../utils/token";
 
-export const signToken: RegularMiddlewareWithoutNext = async (req, res) => {
-  if (!req.user || Object.keys(req.user).length <= 0) throw customError("fail");
+export const assignToken: RegularMiddlewareWithoutNext = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+
+  const userId = matchedData(req).userId;
 
   const payload: JwtPayload = {
-    id: req.user.id as string,
+    id: userId,
   };
-
-  const secret = process.env.JWT_SECRET as string;
-
+  const secret = process.env.JWT_SECRET as Secret;
   const options: SignOptions = {
     algorithm: "HS256",
     expiresIn: "1d",
   };
 
-  const token = sign(payload, Buffer.from(secret), options);
+  const token = generateToken(payload, secret, options);
 
   if (!token) throw customError("fail");
 

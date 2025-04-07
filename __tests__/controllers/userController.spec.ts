@@ -14,7 +14,7 @@ describe("User controller suite", () => {
   };
 
   test("get user by id request", async () => {
-    (service.getUserById as jest.Mock) = jest.fn().mockResolvedValue(user);
+    jest.spyOn(service, "getUserById").mockResolvedValue(user);
 
     const res: Response = await request(app)
       .get("/user")
@@ -22,42 +22,50 @@ describe("User controller suite", () => {
 
     expect(service.getUserById).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toBeDefined();
     expect(res.body.user).toBeDefined();
   });
 
   test("change user password request", async () => {
-    (service.changeUserPassword as jest.Mock) = jest.fn();
+    const oldPassMock: string = "12345678";
+    const newPassMock: string = "41241ERhe!&%";
+
+    jest.spyOn(service, "changeUserPassword").mockResolvedValue(true);
 
     const res: Response = await request(app)
       .put("/user/changepassword")
-      .send({ oldPassword: "12345678", newPassword: "123456789" })
+      .send({
+        oldPassword: oldPassMock,
+        newPassword: newPassMock,
+        confirmPassword: newPassMock,
+      })
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.changeUserPassword).toHaveBeenCalled();
     expect(res.statusCode).toEqual(201);
+    expect(res.body.status).toBeDefined();
   });
 
   test("reset user password request", async () => {
     const tokenMock: string = "token-mock";
-    const newPasswordMock: string = "password-mock";
+    const newPasswordMock: string = "41241ERhe!&%";
 
-    (service.resetUserPassword as jest.Mock) = jest
-      .fn()
-      .mockResolvedValue(true);
+    jest.spyOn(service, "resetUserPassword").mockResolvedValue(true);
 
     const res: Response = await request(app)
       .put(`/user/resetpassword/${tokenMock}`)
-      .send({ newPassword: newPasswordMock });
+      .send({ newPassword: newPasswordMock, confirmPassword: newPasswordMock });
 
     expect(service.resetUserPassword).toHaveBeenCalledWith(
       tokenMock,
       newPasswordMock
     );
     expect(res.statusCode).toEqual(201);
+    expect(res.body.status).toBeDefined();
   });
 
   test("delete user by id request", async () => {
-    (service.deleteUserById as jest.Mock) = jest.fn();
+    jest.spyOn(service, "deleteUserById").mockResolvedValue(true);
 
     const res: Response = await request(app)
       .delete("/user/deleteaccount")

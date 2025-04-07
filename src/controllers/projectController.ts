@@ -14,12 +14,9 @@ export const createProjectPost: RegularMiddlewareWithoutNext = async (
 
   const data = matchedData<ProjectModel>(req);
 
-  const project: ProjectModel = {
+  const createdProject: ProjectModel | undefined = await service.createProject({
     ...data,
-  };
-
-  const createdProject: ProjectModel | undefined =
-    await service.createProject(project);
+  });
 
   if (!createdProject || Object.keys(createdProject).length <= 0)
     throw customError();

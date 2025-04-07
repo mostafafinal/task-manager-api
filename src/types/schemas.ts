@@ -10,7 +10,6 @@ export interface IUser {
 
 export interface UserModel extends Model<IUser> {
   checkUserByEmail(email: string): Promise<boolean>;
-  getUser(email: string): Promise<IUser>;
 }
 
 export interface TaskModel {

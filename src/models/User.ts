@@ -38,12 +38,4 @@ userSchema.static(
   }
 );
 
-userSchema.static("getUser", async function getUser(userEmail) {
-  const user = await this.findOne({ email: userEmail });
-
-  if (user) return user;
-
-  return "User not found";
-});
-
 export const User = model<IUser, UserModel>("User", userSchema);

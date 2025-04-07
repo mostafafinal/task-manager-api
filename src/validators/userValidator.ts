@@ -65,8 +65,7 @@ export const credentials: ValidationChain[] = [
     .bail()
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])/)
     .withMessage(errMsg.passwords.safe)
-    .bail()
-    .escape(),
+    .bail(),
   body("confirmPassword")
     .notEmpty()
     .trim()
@@ -74,6 +73,5 @@ export const credentials: ValidationChain[] = [
     .bail()
     .custom((value, { req }) => value === req.body.newPassword)
     .withMessage(errMsg.credentials.match)
-    .bail()
-    .escape(),
+    .bail(),
 ];

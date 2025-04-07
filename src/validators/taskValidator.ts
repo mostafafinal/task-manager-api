@@ -43,8 +43,7 @@ export const newtask: ValidationChain[] = [
     .bail()
     .isLength({ min: 2, max: 100 })
     .withMessage(errMsg.task.name.length)
-    .bail()
-    .escape(),
+    .bail(),
   body("status")
     .notEmpty()
     .trim()
@@ -76,8 +75,7 @@ export const newtask: ValidationChain[] = [
     .isLength({ max: 1000 })
     .withMessage(errMsg.task.description.length)
     .bail()
-    .optional()
-    .escape(),
+    .optional(),
   body("projectId")
     .notEmpty()
     .trim()
@@ -98,8 +96,7 @@ export const newData: ValidationChain[] = [
     .isLength({ min: 2, max: 100 })
     .withMessage(errMsg.task.name.length)
     .bail()
-    .optional()
-    .escape(),
+    .optional(),
   body("status")
     .notEmpty()
     .trim()
@@ -134,6 +131,5 @@ export const newData: ValidationChain[] = [
     .isLength({ max: 1000 })
     .withMessage(errMsg.task.description.length)
     .bail()
-    .optional()
-    .escape(),
+    .optional(),
 ];
