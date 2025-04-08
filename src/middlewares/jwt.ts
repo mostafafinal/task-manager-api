@@ -20,7 +20,7 @@ export const assignToken: RegularMiddlewareWithoutNext = async (req, res) => {
     expiresIn: "1d",
   };
 
-  const token = generateToken(payload, secret, options);
+  const token = await generateToken(payload, secret, options);
 
   if (!token) throw customError("fail");
 
