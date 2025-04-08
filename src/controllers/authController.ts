@@ -61,13 +61,14 @@ export const loginGoogle: RegularMiddleware[] = [
   }),
 ];
 
-export const loginGoogleCB: RegularMiddleware = passport.authenticate(
-  "google",
-  {
-    failureRedirect: "/",
+export const loginGoogleCB: RegularMiddleware[] = [
+  passport.authenticate("google", {
     session: false,
-  }
-);
+  }),
+  (req, res) => {
+    res.redirect(process.env.FRONTEND_URL || "/");
+  },
+];
 
 export const forgetPasswordPost: RegularMiddlewareWithoutNext = async (
   req,

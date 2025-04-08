@@ -23,6 +23,7 @@ authRouter.get("/google", controller.loginGoogle);
 authRouter.get(
   "/google/callback",
   controller.loginGoogleCB,
+  validateUserId,
   tryCatch(assignToken)
 );
 
