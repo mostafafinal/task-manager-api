@@ -1,0 +1,53 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGO_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../types/prisma"
+}
+
+model users {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique(map: "email_1")
+  firstName String
+  lastName  String
+  password  String
+  projects  projects[]
+  tasks     tasks[]
+  createdAt   DateTime? @db.Date @default(now())
+  updatedAt   DateTime? @db.Date @updatedAt
+  v    Int    @map("__v") @default(0)
+}
+
+model projects {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  deadline    DateTime @db.Date
+  description String?
+  name        String
+  priority    String
+  status      String
+  tasks       tasks[]
+  user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String   @map("users") @db.ObjectId 
+  createdAt   DateTime? @db.Date @default(now())
+  updatedAt   DateTime? @db.Date @updatedAt
+  v    Int    @map("__v") @default(0)
+}
+
+model tasks {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  deadline    DateTime @db.Date
+  description String?
+  name        String
+  priority    String
+  status      String
+  project     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String   @map("users") @db.ObjectId
+  projectId   String   @map("projects") @db.ObjectId
+  createdAt   DateTime? @db.Date @default(now())
+  updatedAt   DateTime? @db.Date @updatedAt
+  v    Int    @map("__v") @default(0)
+}
