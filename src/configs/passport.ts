@@ -16,9 +16,8 @@ import {
   StrategyOptionsWithoutRequest,
 } from "passport-jwt";
 import { loginUser } from "../services/authService";
-import { User } from "../models/User";
+import { prisma } from "./prisma";
 import { config } from "dotenv";
-import { IUser } from "../types/schemas";
 
 config();
 
@@ -38,18 +37,16 @@ const googleVerifyCallback: GoogleVerifyCB = async (
     if (!profile.email)
       throw new Error("email's not provided from the profile!");
 
-    const user = await User.findOne({ email: profile.email });
-
-    if (!user) {
-      const newUser = await User.create<IUser>({
+    const user = await prisma.users.upsert({
+      where: { email: profile.email },
+      create: {
         firstName: profile.given_name,
         lastName: profile.family_name,
         email: profile.email,
         password: profile.sub,
-      });
-
-      return done(null, newUser);
-    }
+      },
+      update: {},
+    });
 
     done(null, user);
   } catch (error) {
@@ -66,15 +63,16 @@ const localOpts: IStrategyOptions = {
   usernameField: "email",
 };
 
-const verifyUserCredientials: VerifyFunction = async (
+const localVerifyCallback: VerifyFunction = async (
   username,
   password,
   done
 ) => {
   try {
-    const user = await loginUser({ email: username, password: password });
     if (!username || !password)
       throw new Error("email or password is not provided");
+
+    const user = await loginUser({ email: username, password: password });
 
     if (!user) {
       return done(null, false);
@@ -88,7 +86,7 @@ const verifyUserCredientials: VerifyFunction = async (
 
 const localStrategy: LocalStrategy = new LocalStrategy(
   localOpts,
-  verifyUserCredientials
+  localVerifyCallback
 );
 
 const jwtOpts: StrategyOptionsWithoutRequest = {
@@ -96,11 +94,15 @@ const jwtOpts: StrategyOptionsWithoutRequest = {
   secretOrKey: process.env.JWT_SECRET as string,
 };
 
-const verifyUserFromToken: VerifyCallback = async (payload, done) => {
+const jwtVerifyUserCallback: VerifyCallback = async (payload, done) => {
   try {
     if (!payload.id || payload.id.length !== 24) return done(null, false);
 
-    const user = await User.findOne({ _id: payload.id });
+    const user = await prisma.users.findUnique({
+      where: {
+        id: payload.id,
+      },
+    });
 
     if (!user) return done(null, false);
 
@@ -110,7 +112,10 @@ const verifyUserFromToken: VerifyCallback = async (payload, done) => {
   }
 };
 
-const jwtStrategy: JwtStrategy = new JwtStrategy(jwtOpts, verifyUserFromToken);
+const jwtStrategy: JwtStrategy = new JwtStrategy(
+  jwtOpts,
+  jwtVerifyUserCallback
+);
 
 passport.use(localStrategy);
 passport.use(googleStrategy);
