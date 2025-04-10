@@ -1,112 +1,82 @@
 import * as service from "../../src/services/projectService";
-import { Project } from "../../src/models/Project";
-import agenda from "../../src/configs/agenda";
+import { prisma } from "../../src/configs/prisma";
 import { faker } from "@faker-js/faker";
-import { ProjectModel } from "../../src/types/schemas";
-import { Types } from "mongoose";
-import { User } from "../../src/models/User";
+import { projects } from "../../src/types/prisma";
 
-jest.mock("../../src/models/Project");
-jest.mock("../../src/models/User");
-jest.mock("../../src/configs/agenda");
+const prismaMock = jest.mocked(prisma);
 
 describe("project service testing", () => {
-  const id: Types.ObjectId = new Types.ObjectId(
-    faker.database.mongodbObjectId()
-  );
-  const project: ProjectModel = {
+  const project: projects = {
+    id: faker.database.mongodbObjectId(),
     name: faker.commerce.productName(),
     deadline: faker.date.soon(),
     status: faker.helpers.arrayElement(["active", "completed"]),
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
-    userId: new Types.ObjectId(faker.database.mongodbObjectId()),
+    userId: faker.database.mongodbObjectId(),
+    createdAt: faker.date.anytime(),
+    updatedAt: faker.date.recent(),
+    v: 0,
   };
 
   afterEach(() => jest.clearAllMocks());
 
   test("create new project test", async () => {
-    Project.create = jest.fn().mockResolvedValue(project);
-    jest.spyOn(User, "updateOne");
+    prismaMock.projects.create.mockResolvedValue(project);
 
-    await service.createProject(project);
+    const createdProject = await service.createProject(project);
 
-    expect(Project.create).toHaveBeenCalledWith(project);
-    expect(User.updateOne).toHaveBeenCalled();
+    expect(prismaMock.projects.create).toHaveBeenCalled();
+    expect(createdProject).toBe(createdProject);
   });
 
   test("get all projects test", async () => {
     const countedProjects = 100;
     const limit: number = 10;
     const page: number = 2;
-    const skippedNumOfProjects: number = (page - 1) * limit;
+    const pagesNum: number = countedProjects / limit;
 
-    const countDocumentsMock = jest.fn().mockResolvedValue(countedProjects);
-    const selectMethodMock = jest.fn();
+    prismaMock.projects.count.mockResolvedValue(countedProjects);
+    prismaMock.projects.findMany.mockResolvedValue([project, project]);
 
-    const limitMethodMock = jest.fn().mockReturnValue({
-      select: selectMethodMock,
+    const projects = await service.getProjects(project.id, page, limit);
+
+    expect(prismaMock.projects.findMany).toHaveBeenCalled();
+    expect(projects).toStrictEqual({
+      projects: [project, project],
+      pages: pagesNum,
     });
-    const skipMethodMock = jest.fn().mockReturnValue({
-      limit: limitMethodMock,
-    });
-
-    Project.find = jest
-      .fn()
-      .mockReturnValueOnce({
-        countDocuments: countDocumentsMock,
-      })
-      .mockReturnValueOnce({
-        skip: skipMethodMock,
-      });
-
-    await service.getProjects(id, page, limit);
-
-    expect(countDocumentsMock).toHaveBeenCalled();
-    expect(skipMethodMock).toHaveBeenCalledWith(skippedNumOfProjects);
-    expect(limitMethodMock).toHaveBeenCalledWith(limit);
-    expect(selectMethodMock).toHaveBeenCalled();
-    expect(Project.find).toHaveBeenCalledTimes(2);
   });
 
   test("get project data", async () => {
-    const populateMethodMock = jest.fn();
-    Project.findById = jest.fn().mockReturnValue({
-      populate: populateMethodMock,
-    });
+    prismaMock.projects.findUnique.mockResolvedValue(project);
 
-    await service.getProject(id);
+    const returnedProject = await service.getProject(project.id);
 
-    expect(Project.findById).toHaveBeenCalledWith(id);
-    expect(populateMethodMock).toHaveBeenCalled();
+    expect(prismaMock.projects.findUnique).toHaveBeenCalled();
+    expect(returnedProject).toMatchObject<projects>(project);
   });
 
   test("update project", async () => {
-    const newData: Partial<ProjectModel> = {
+    const newData: Partial<projects> = {
       name: faker.commerce.productName(),
       deadline: faker.date.future(),
     };
 
-    Project.updateOne = jest.fn().mockResolvedValue(true);
+    prismaMock.projects.update.mockResolvedValue(project);
 
-    await service.updateProject(id, newData);
+    const updatedProject = await service.updateProject(project.id, newData);
 
-    expect(Project.updateOne).toHaveBeenLastCalledWith(
-      { _id: id },
-      { ...newData }
-    );
+    expect(prismaMock.projects.update).toHaveBeenCalled();
+    expect(updatedProject).toMatchObject<projects>(project);
   });
 
   test("delete project", async () => {
-    Project.deleteOne = jest.fn().mockResolvedValue(true);
-    jest.spyOn(User, "updateOne");
+    prismaMock.projects.delete.mockResolvedValue(project);
 
-    agenda.now = jest.fn();
+    const deletedProject = await service.deleteProject(project.id);
 
-    await service.deleteProject(id, id);
-
-    expect(Project.deleteOne).toHaveBeenCalledWith({ _id: id });
-    expect(User.updateOne).toHaveBeenCalled();
-    expect(agenda.now).toHaveBeenCalledWith("delete project tasks", id);
+    expect(prismaMock.projects.delete).toHaveBeenCalled();
+    expect(deletedProject).toMatchObject<projects>(project);
   });
 });

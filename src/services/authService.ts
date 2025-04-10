@@ -1,23 +1,27 @@
-import { User } from "../models/User";
+import { prisma } from "../configs/prisma";
 import { hashPassword, verifyPassword } from "../utils/bcryption";
-import { IUser } from "../types/schemas";
+import { users } from "../types/prisma";
 import { generateToken } from "../utils/token";
 import { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 import { resetPasswordEmail } from "../utils/mail";
 
-export type RegisterUser = (data: IUser) => Promise<boolean | undefined>;
+export type RegisterUser = (data: users) => Promise<boolean | undefined>;
 
 export const registerUser: RegisterUser = async (userData) => {
   try {
-    const isExisted = await User.checkUserByEmail(userData.email);
+    const isExisted = await prisma.users.findUnique({
+      where: { email: userData.email },
+    });
 
     if (isExisted) throw new Error("user is already existed, try to login");
 
     const hashedPassword = await hashPassword(userData.password);
 
-    const createdUser = await User.create({
-      ...userData,
-      password: hashedPassword,
+    const createdUser = await prisma.users.create({
+      data: {
+        ...userData,
+        password: hashedPassword,
+      },
     });
 
     if (createdUser) return true;
@@ -26,11 +30,15 @@ export const registerUser: RegisterUser = async (userData) => {
   }
 };
 
-type LoginUser = (data: Partial<IUser>) => Promise<IUser | undefined>;
+type LoginUser = (data: Partial<users>) => Promise<users | undefined>;
 
 export const loginUser: LoginUser = async (userData) => {
   try {
-    const user = await User.findOne({ email: userData.email });
+    const user = await prisma.users.findUnique({
+      where: {
+        email: userData.email,
+      },
+    });
 
     if (!user) throw new Error("User is not existed");
 
@@ -53,11 +61,14 @@ export const forgetPassword: ForgetPassword = async (userEmail) => {
   try {
     if (!userEmail) throw new Error("user email's not provided");
 
-    const userId = await User.findOne({ email: userEmail }).select("_id");
+    const userId = await prisma.users.findUnique({
+      where: { email: userEmail },
+      select: { id: true },
+    });
 
     if (!userId) throw new Error("user's not existed!");
 
-    const payload: JwtPayload = { id: userId };
+    const payload: JwtPayload = userId;
     const secret = process.env.JWT_SECRET as Secret;
     const options: SignOptions = {
       algorithm: "HS256",

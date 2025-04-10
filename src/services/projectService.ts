@@ -1,27 +1,19 @@
-import { Types } from "mongoose";
-import { Project } from "../models/Project";
-import { ProjectModel } from "../types/schemas";
-import agenda from "../configs/agenda";
-import { User } from "../models/User";
+import { projects } from "../types/prisma";
+import { prisma } from "../configs/prisma";
 
-export type CreateProject = (
-  data: ProjectModel
-) => Promise<ProjectModel | undefined>;
+export type CreateProject = (data: projects) => Promise<projects | undefined>;
 
 export const createProject: CreateProject = async (projectData) => {
   try {
     if (!projectData) throw new Error("Service: project data's not provided");
 
-    const project = await Project.create(projectData);
+    const project = await prisma.projects.create({
+      data: {
+        ...projectData,
+      },
+    });
 
     if (!project) throw new Error("Service: failed to create project");
-
-    await User.updateOne(
-      { _id: projectData.userId },
-      {
-        $push: { projects: project.id },
-      }
-    );
 
     return project;
   } catch (error) {
@@ -30,29 +22,39 @@ export const createProject: CreateProject = async (projectData) => {
 };
 
 export type GetProjects = (
-  userId: Types.ObjectId,
+  userId: string,
   page: number,
   limit: number
-) => Promise<{ projects: ProjectModel[]; pages: number } | undefined>;
+) => Promise<{ projects: Partial<projects>[]; pages: number } | undefined>;
 
-export const getProjects = async (
-  userId: Types.ObjectId,
+export const getProjects: GetProjects = async (
+  userId: string,
   page: number = 1,
   limit: number = 20
 ) => {
   try {
     if (!userId) throw new Error("Service: user's id's not provided");
 
-    const startIndex: number = (page - 1) * limit;
-    const totalProjects: number = await Project.find({
-      userId: userId,
-    }).countDocuments();
-    const paginations: number = Math.ceil(totalProjects / limit);
+    const startIndex: number = (+page - 1) * +limit;
 
-    const projects = await Project.find({ userId: userId })
-      .skip(startIndex)
-      .limit(limit)
-      .select(["name", "deadline", "priority", "status"]);
+    const totalProjects: number = await prisma.projects.count({
+      where: { userId: userId },
+    });
+
+    const paginations: number = Math.ceil(totalProjects / +limit);
+
+    const projects = await prisma.projects.findMany({
+      where: { userId: userId },
+      take: +limit,
+      skip: startIndex,
+      select: {
+        id: true,
+        name: true,
+        deadline: true,
+        priority: true,
+        status: true,
+      },
+    });
 
     return { projects: projects, pages: paginations };
   } catch (error) {
@@ -61,29 +63,40 @@ export const getProjects = async (
 };
 
 export type GetProject = (
-  projectId: Types.ObjectId
-) => Promise<ProjectModel | undefined>;
+  projectId: string
+) => Promise<Partial<projects> | undefined>;
 
 export const getProject: GetProject = async (projectId) => {
   try {
     if (!projectId) throw new Error("project id is not provided");
 
-    const project: ProjectModel | null = await Project.findById(
-      projectId
-    ).populate("tasks", ["name", "priority", "deadline", "status"]);
+    const project = await prisma.projects.findUnique({
+      where: { id: projectId },
+      include: {
+        tasks: {
+          select: {
+            id: true,
+            name: true,
+            priority: true,
+            deadline: true,
+            status: true,
+          },
+        },
+      },
+    });
 
     if (!project) throw Error("project not found");
 
     return project;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
 export type UpdateProject = (
-  projectId: Types.ObjectId,
-  updates: Partial<ProjectModel>
-) => Promise<boolean | undefined>;
+  projectId: string,
+  updates: Partial<projects>
+) => Promise<projects | undefined>;
 
 export const updateProject: UpdateProject = async (projectId, updates) => {
   try {
@@ -92,31 +105,28 @@ export const updateProject: UpdateProject = async (projectId, updates) => {
         "Service: either invalid project id or empty update data"
       );
 
-    const result = await Project.updateOne({ _id: projectId }, { ...updates });
+    const result = await prisma.projects.update({
+      data: { ...updates, v: { increment: 1 } },
+      where: { id: projectId },
+    });
 
-    return result.acknowledged;
+    return result;
   } catch (error) {
     console.error(error);
   }
 };
 
 export type DeleteProject = (
-  projectId: Types.ObjectId,
-  userId: Types.ObjectId
-) => Promise<boolean | undefined>;
+  projectId: string
+) => Promise<projects | undefined>;
 
-export const deleteProject: DeleteProject = async (projectId, userId) => {
+export const deleteProject: DeleteProject = async (projectId) => {
   try {
-    if (!projectId || !userId)
-      throw new Error("Service: project or user id's not provided");
+    if (!projectId) throw new Error("project id's not provided");
 
-    const result = await Project.deleteOne({ _id: projectId });
+    const result = await prisma.projects.delete({ where: { id: projectId } });
 
-    await User.updateOne({ _id: userId }, { $pull: { projects: projectId } });
-
-    await agenda.now("delete project tasks", projectId);
-
-    return result.acknowledged;
+    return result;
   } catch (error) {
     console.error(error);
   }

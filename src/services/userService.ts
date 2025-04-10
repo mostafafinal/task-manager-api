@@ -1,22 +1,25 @@
-import { Types } from "mongoose";
-import { IUser } from "../types/schemas";
-import { User } from "../models/User";
+import { users } from "../types/prisma";
+import { prisma } from "../configs/prisma";
 import * as bcrypt from "../utils/bcryption";
-import agenda from "../configs/agenda";
 import { verifyToken } from "../utils/token";
 import { JwtPayload, Secret } from "jsonwebtoken";
 
-export const getUserById = async (
-  userId: Types.ObjectId
-): Promise<Partial<IUser> | undefined> => {
+export type GetUserById = (
+  userId: string
+) => Promise<Partial<users> | undefined>;
+
+export const getUserById: GetUserById = async (userId) => {
   try {
-    if (!userId) throw Error("service: user id's not provided");
+    if (!userId) throw Error("user id's not provided");
 
-    const user: Partial<IUser> | null = await User.findById({
-      _id: userId,
-    }).select(["firstName", "lastName", "email"]);
+    const user = await prisma.users.findUnique({
+      where: {
+        id: userId,
+      },
+      select: { firstName: true, lastName: true, email: true },
+    });
 
-    if (!user) throw Error("service: user's not found");
+    if (!user) throw Error("user's not found");
 
     return user;
   } catch (error) {
@@ -24,41 +27,58 @@ export const getUserById = async (
   }
 };
 
-export const changeUserPassword = async (
-  userId: Types.ObjectId,
+export type ChangeUserPassword = (
+  userId: string,
   oldPassword: string,
   newPassword: string
-): Promise<boolean | undefined> => {
+) => Promise<boolean | undefined>;
+
+export const changeUserPassword: ChangeUserPassword = async (
+  userId,
+  oldPassword,
+  newPassword
+) => {
   try {
     if (!userId || !oldPassword || !newPassword)
       throw new Error("either user id or old/new password is not provided");
 
-    const user: Partial<IUser> | null =
-      await User.findById(userId).select("password");
+    const currUser = await prisma.users.findUnique({
+      where: { id: userId },
+      select: { password: true },
+    });
 
-    if (!(await bcrypt.verifyPassword(oldPassword, user?.password as string)))
+    if (
+      !(await bcrypt.verifyPassword(oldPassword, currUser?.password as string))
+    )
       throw new Error("current password's incorrect!");
 
     const newHashedPassword: string = await bcrypt.hashPassword(newPassword);
 
-    if (await bcrypt.verifyPassword(newPassword, user?.password as string))
+    if (await bcrypt.verifyPassword(newPassword, currUser?.password as string))
       throw new Error("user password's already the same!");
 
-    const result = await User.updateOne(
-      { _id: userId },
-      { password: newHashedPassword }
-    );
+    const user = await prisma.users.update({
+      data: { password: newHashedPassword, v: { increment: 1 } },
+      where: { id: userId },
+    });
 
-    return result.acknowledged;
+    if (!user) throw new Error("failed to change user password!");
+
+    return true;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const resetUserPassword = async (
+export type ResetUserPassword = (
   token: string,
   newPassword: string
-): Promise<boolean | undefined> => {
+) => Promise<boolean | undefined>;
+
+export const resetUserPassword: ResetUserPassword = async (
+  token,
+  newPassword
+) => {
   try {
     if (!token || !newPassword)
       throw new Error("either token or new password is not provided");
@@ -72,29 +92,30 @@ export const resetUserPassword = async (
 
     const hashedPassword = await bcrypt.hashPassword(newPassword);
 
-    const result = await User.updateOne(
-      { _id: payload.id },
-      { password: hashedPassword }
-    );
+    const user = await prisma.users.update({
+      data: { password: hashedPassword, v: { increment: 1 } },
+      where: { id: payload.id },
+    });
 
-    return result.acknowledged;
+    if (!user) throw new Error("failed to reset user password!");
+
+    return true;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const deleteUserById = async (
-  userId: Types.ObjectId
-): Promise<boolean | undefined> => {
+export type DeleteUserById = (userId: string) => Promise<boolean | undefined>;
+
+export const deleteUserById: DeleteUserById = async (userId) => {
   try {
-    if (!userId) throw new Error("service: user id's not provided");
+    if (!userId) throw new Error("user id's not provided");
 
-    const result = await User.deleteOne({ _id: userId });
+    const user = await prisma.users.delete({ where: { id: userId } });
 
-    agenda.now("delete user projects", userId);
-    agenda.now("delete user tasks", userId);
+    if (!user) throw new Error("failed to delete user!");
 
-    return result.acknowledged;
+    return true;
   } catch (error) {
     console.error(error);
   }

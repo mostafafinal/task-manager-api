@@ -1,76 +1,65 @@
-import {
-  createTask,
-  deleteTask,
-  getTask,
-  updateTask,
-} from "../../src/services/taskService";
-import { Task } from "../../src/models/Task";
+import * as service from "../../src/services/taskService";
+import { tasks } from "../../src/types/prisma";
 import { faker } from "@faker-js/faker";
-import { TaskModel } from "../../src/types/schemas";
-import { Types } from "mongoose";
-import { Project } from "../../src/models/Project";
+import { prisma } from "../../src/configs/prisma";
 
-jest.mock("../../src/models/Task");
-jest.mock("../../src/models/Project");
+const prismaMock = jest.mocked(prisma);
 
 describe("task service testing", () => {
-  const id: Types.ObjectId = new Types.ObjectId(
-    faker.database.mongodbObjectId()
-  );
-  const task: TaskModel = {
+  const task: tasks = {
+    id: faker.database.mongodbObjectId(),
     name: faker.commerce.productName(),
     deadline: faker.date.soon(),
     status: faker.helpers.arrayElement(["active", "completed"]),
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
-    projectId: new Types.ObjectId(faker.database.mongodbObjectId()),
-    userId: id,
+    projectId: faker.database.mongodbObjectId(),
+    userId: faker.database.mongodbObjectId(),
+    createdAt: faker.date.anytime(),
+    updatedAt: faker.date.recent(),
+    v: 0,
   };
 
   afterEach(() => jest.clearAllMocks);
 
   test("create new task test", async () => {
-    Task.create = jest.fn().mockResolvedValue(task);
-    jest.spyOn(Project, "updateOne");
+    prismaMock.tasks.create.mockResolvedValue(task);
 
-    await createTask(task);
+    const createdTask = await service.createTask(task);
 
-    expect(Task.create).toHaveBeenCalledWith(task);
-    expect(Project.updateOne).toHaveBeenCalled();
+    expect(prismaMock.tasks.create).toHaveBeenCalled();
+    expect(createdTask).toMatchObject<tasks>(task);
   });
 
   test("get task data", async () => {
-    Task.findById = jest.fn().mockResolvedValue(task);
+    prismaMock.tasks.findUnique.mockResolvedValue(task);
 
-    const taskGet: TaskModel | undefined = await getTask(id);
+    const returnedTask = await service.getTask(task.id);
 
-    expect(Task.findById).toHaveBeenLastCalledWith(id);
-    expect(taskGet).toMatchObject<TaskModel>(task);
+    expect(prismaMock.tasks.findUnique).toHaveBeenCalled();
+    expect(returnedTask).toMatchObject<tasks>(task);
   });
 
   test("update task test", async () => {
-    const newData: Partial<TaskModel> = {
+    const newData: Partial<tasks> = {
       name: faker.commerce.productName(),
       deadline: faker.date.future(),
     };
 
-    Task.updateOne = jest.fn().mockResolvedValue(true);
+    prismaMock.tasks.update.mockResolvedValue(task);
 
-    await updateTask(id, newData);
+    const updatedTask = await service.updateTask(task.id, newData);
 
-    expect(Task.updateOne).toHaveBeenLastCalledWith(
-      { _id: id },
-      { ...newData }
-    );
+    expect(prismaMock.tasks.update).toHaveBeenCalled();
+    expect(updatedTask).toMatchObject<tasks>(task);
   });
 
   test("delete task test", async () => {
-    Task.findOneAndDelete = jest.fn().mockResolvedValue(task);
-    jest.spyOn(Project, "updateOne");
+    prismaMock.tasks.delete.mockResolvedValue(task);
 
-    await deleteTask(id);
+    const deletedTask = await service.deleteTask(task.id);
 
-    expect(Task.findOneAndDelete).toHaveBeenCalled();
-    expect(Project.updateOne).toHaveBeenCalled();
+    expect(prismaMock.tasks.delete).toHaveBeenCalled();
+    expect(deletedTask).toMatchObject<tasks>(task);
   });
 });

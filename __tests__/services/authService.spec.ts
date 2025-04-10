@@ -1,27 +1,31 @@
+import { prisma } from "../../src/configs/prisma";
 import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/authService";
-import { User } from "../../src/models/User";
-import { IUser } from "../../src/types/schemas";
-import { hashPassword, verifyPassword } from "../../src/utils/bcryption";
+import { users } from "../../src/types/prisma";
+import * as bcrypt from "../../src/utils/bcryption";
 import * as token from "../../src/utils/token";
-import { resetPasswordEmail } from "../../src/utils/mail";
+import * as mail from "../../src/utils/mail";
 import { JwtPayload } from "jsonwebtoken";
 
-jest.mock("../../src/models/User");
+const prismaMock = jest.mocked(prisma);
 jest.mock("../../src/utils/bcryption");
 jest.mock("../../src/utils/mail.ts");
 
 describe("User Authentication Test", () => {
-  let user: IUser;
+  let user: users;
   const originalEnv = process.env;
 
   beforeEach(() => {
     user = {
+      id: faker.database.mongodbObjectId(),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       email: faker.internet.email(),
       password: faker.internet.password(),
-    } as IUser;
+      createdAt: faker.date.anytime(),
+      updatedAt: faker.date.recent(),
+      v: 0,
+    };
 
     jest.resetModules();
     process.env = {
@@ -37,27 +41,31 @@ describe("User Authentication Test", () => {
   });
 
   test("User Register Test", async () => {
-    User.checkUserByEmail = jest.fn().mockResolvedValue(false);
-    User.create = jest.fn();
-    (hashPassword as jest.Mock) = jest.fn();
+    prismaMock.users.create.mockResolvedValue(user);
+    prismaMock.users.findUnique.mockResolvedValue(null);
 
-    await service.registerUser(user);
+    jest.spyOn(bcrypt, "hashPassword");
 
-    expect(User.create).toHaveBeenCalled();
-    expect(hashPassword).toHaveBeenCalled();
+    const createdUser = await service.registerUser(user);
+
+    expect(prismaMock.users.findUnique).toHaveBeenCalled();
+    expect(bcrypt.hashPassword).toHaveBeenCalled();
+    expect(prismaMock.users.create).toHaveBeenCalled();
+    expect(createdUser).toBeTruthy();
   });
 
   test("User Login Test", async () => {
-    User.findOne = jest.fn().mockReturnValue(user);
-
-    (verifyPassword as jest.Mock).mockResolvedValue(true);
+    prismaMock.users.findUnique.mockResolvedValue(user);
+    jest.spyOn(bcrypt, "verifyPassword").mockResolvedValue(true);
 
     const login = await service.loginUser({
       email: user.email,
       password: user.password,
     });
 
-    expect(login).toMatchObject<IUser>(user);
+    expect(prisma.users.findUnique).toHaveBeenCalled();
+    expect(bcrypt.verifyPassword).toHaveBeenCalled();
+    expect(login).toMatchObject<users>(user);
   });
 
   test("Forget password", async () => {
@@ -65,20 +73,19 @@ describe("User Authentication Test", () => {
     const idMock: string = faker.database.mongodbObjectId();
     const payloadMock: JwtPayload = { id: idMock };
 
-    const selectImplementationMock = jest.fn().mockResolvedValue(idMock);
-    User.findOne = jest.fn().mockReturnValue({
-      select: selectImplementationMock,
-    });
+    prismaMock.users.findUnique.mockResolvedValue({ id: idMock } as users);
 
     jest.spyOn(token, "generateToken").mockResolvedValue("token-mock");
+    jest.spyOn(mail, "resetPasswordEmail").mockResolvedValue();
 
     await service.forgetPassword(userEmailMock);
 
-    expect(User.findOne).toHaveBeenCalledWith({ email: userEmailMock });
+    expect(prismaMock.users.findUnique).toHaveBeenCalled();
     expect(token.generateToken).toHaveBeenCalledWith(
       payloadMock,
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      expect.any(Object)
     );
-    expect(resetPasswordEmail).toBeTruthy();
+    expect(mail.resetPasswordEmail).toBeTruthy();
   });
 });

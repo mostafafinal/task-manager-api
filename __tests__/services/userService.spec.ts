@@ -1,24 +1,23 @@
-import { Types } from "mongoose";
-import { User } from "../../src/models/User";
+import { prisma } from "../../src/configs/prisma";
 import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/userService";
-import { IUser } from "../../src/types/schemas";
+import { users } from "../../src/types/prisma";
 import * as bcrypt from "../../src/utils/bcryption";
-import agenda from "../../src/configs/agenda";
 import * as token from "../../src/utils/token";
 import { JwtPayload } from "jsonwebtoken";
 
-jest.mock("../../src/models/User");
-jest.mock("../../src/utils/bcryption");
+const prismaMock = jest.mocked(prisma);
 
 describe("User service suite", () => {
-  const id: Types.ObjectId = new Types.ObjectId(
-    faker.database.mongodbObjectId()
-  );
-  const user: Partial<IUser> = {
+  const user: users = {
+    id: faker.database.mongodbObjectId(),
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
     email: faker.internet.email(),
+    password: faker.internet.password(),
+    createdAt: faker.date.anytime(),
+    updatedAt: faker.date.recent(),
+    v: 0,
   };
   const originalEnv = process.env;
 
@@ -38,25 +37,20 @@ describe("User service suite", () => {
   });
 
   test("get user data", async () => {
-    const selectMethodMock = jest.fn().mockResolvedValue(user);
-    User.findById = jest.fn().mockReturnValue({
-      select: selectMethodMock,
-    });
+    prismaMock.users.findUnique.mockResolvedValue(user);
 
-    const userData: Partial<IUser> | undefined = await service.getUserById(id);
+    const returnedUser = await service.getUserById(user.id);
 
-    expect(User.findById).toHaveBeenCalledWith({ _id: id });
-    expect(selectMethodMock).toHaveBeenCalled();
-    expect(userData).toMatchObject<Partial<IUser>>(user);
+    expect(prismaMock.users.findUnique).toHaveBeenCalled();
+    expect(returnedUser).toMatchObject<users>(user);
   });
 
   test("change user password", async () => {
-    const mockReturnedPassword = jest.fn().mockResolvedValue("12345678");
-    (User.findById as jest.Mock).mockReturnValue({
-      select: mockReturnedPassword,
-    });
+    prismaMock.users.findUnique.mockResolvedValue({
+      password: "12345678",
+    } as users);
 
-    User.updateOne = jest.fn().mockResolvedValue(true);
+    prismaMock.users.update.mockResolvedValue(user);
 
     (bcrypt.verifyPassword as jest.Mock) = jest
       .fn()
@@ -67,50 +61,49 @@ describe("User service suite", () => {
       .fn()
       .mockResolvedValue("12345678910");
 
-    await service.changeUserPassword(id, "12345678", "12345678910");
-
-    expect(User.findById).toHaveBeenCalledWith(id);
-    expect(User.updateOne).toHaveBeenCalledWith(
-      { _id: id },
-      { password: "12345678910" }
+    const result = await service.changeUserPassword(
+      user.id,
+      "12345678",
+      "12345678910"
     );
+
+    expect(prismaMock.users.findUnique).toHaveBeenCalled();
     expect(bcrypt.verifyPassword).toHaveBeenCalledTimes(2);
     expect(bcrypt.hashPassword).toHaveBeenCalled();
+    expect(prismaMock.users.update).toHaveBeenCalled();
+    expect(result).toBeTruthy();
   });
 
   test("reset user password", async () => {
     const newPaswordMock: string = "123456789";
     const tokenMock: string = "token-mock";
-    const payloadMock: JwtPayload = { id: id };
+    const payloadMock: JwtPayload = { id: user.id };
 
     jest.spyOn(token, "verifyToken").mockResolvedValue(payloadMock as never);
 
-    User.updateOne = jest.fn().mockResolvedValue(true);
+    prismaMock.users.update.mockResolvedValue(user);
 
     (bcrypt.hashPassword as jest.Mock) = jest
       .fn()
       .mockResolvedValue(newPaswordMock);
 
-    await service.resetUserPassword(tokenMock, newPaswordMock);
+    const result = await service.resetUserPassword(tokenMock, newPaswordMock);
 
     expect(token.verifyToken).toHaveBeenCalledWith(
       tokenMock,
       process.env.JWT_SECRET
     );
     expect(bcrypt.hashPassword).toHaveBeenCalledWith(newPaswordMock);
-    expect(User.updateOne).toHaveBeenCalledWith(
-      { _id: id },
-      { password: newPaswordMock }
-    );
+    expect(prismaMock.users.update).toHaveBeenCalled();
+    expect(result).toBeTruthy();
   });
 
   test("delete user", async () => {
-    User.deleteOne = jest.fn().mockResolvedValue(true);
-    jest.spyOn(agenda, "now");
+    prismaMock.users.delete.mockResolvedValue(user);
 
-    await service.deleteUserById(id);
+    const result = await service.deleteUserById(user.id);
 
-    expect(User.deleteOne).toHaveBeenCalledWith({ _id: id });
-    expect(agenda.now).toHaveBeenCalledTimes(2);
+    expect(prismaMock.users.delete).toHaveBeenCalled();
+    expect(result).toBeTruthy();
   });
 });
