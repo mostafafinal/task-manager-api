@@ -4,10 +4,8 @@ import cors from "cors";
 import { appOpt } from "./configs/corsOpts";
 import cookieParser from "cookie-parser";
 import "./configs/passport";
-import "./configs/agenda";
 import indexRouter from "./routes/indexRouter";
 import { errorHandler } from "./middlewares/errorHandler";
-import { connectMongo } from "./configs/mongoose";
 
 config();
 
@@ -23,6 +21,6 @@ app.use("/", indexRouter);
 
 app.use(errorHandler);
 
-app.listen(process.env.PORT, connectMongo);
+app.listen(process.env.PORT, () => console.log("connected"));
 
 export default app;
