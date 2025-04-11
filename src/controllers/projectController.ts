@@ -1,6 +1,6 @@
 import * as service from "../services/projectService";
 import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
-import { ProjectModel } from "../types/schemas";
+import { projects } from "../../src/types/prisma";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
 
@@ -12,11 +12,9 @@ export const createProjectPost: RegularMiddlewareWithoutNext = async (
 
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const data = matchedData<ProjectModel>(req);
+  const data = matchedData<projects>(req);
 
-  const createdProject: ProjectModel | undefined = await service.createProject({
-    ...data,
-  });
+  const createdProject = await service.createProject(data);
 
   if (!createdProject || Object.keys(createdProject).length <= 0)
     throw customError();
@@ -56,7 +54,7 @@ export const getProject: RegularMiddlewareWithoutNext = async (req, res) => {
 
   const data = matchedData(req);
 
-  const project: ProjectModel | undefined = await service.getProject(data.id);
+  const project = await service.getProject(data.id);
 
   if (!project) throw customError("fail", 404, "project not found!");
 
@@ -77,7 +75,7 @@ export const updateProjectPost: RegularMiddlewareWithoutNext = async (
   const projectId = data.id;
   delete data.id;
 
-  const newData: Partial<ProjectModel> = {
+  const newData: Partial<projects> = {
     ...data,
   };
 
@@ -88,6 +86,7 @@ export const updateProjectPost: RegularMiddlewareWithoutNext = async (
   res.status(200).json({
     status: "success",
     message: "project updated successfully",
+    data: serviceResult,
   });
 };
 
@@ -99,9 +98,9 @@ export const deleteProjectPost: RegularMiddlewareWithoutNext = async (
 
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const data = matchedData(req);
+  const data: string = matchedData(req).id;
 
-  const serviceResult = await service.deleteProject(data.id, data.userId);
+  const serviceResult = await service.deleteProject(data);
 
   if (!serviceResult) throw customError();
 

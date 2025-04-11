@@ -1,5 +1,4 @@
 import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
-import { IUser } from "../types/schemas";
 import * as service from "../services/userService";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
@@ -11,7 +10,7 @@ export const getUserGet: RegularMiddlewareWithoutNext = async (req, res) => {
 
   const id = matchedData(req).userId;
 
-  const user: Partial<IUser> | undefined = await service.getUserById(id);
+  const user = await service.getUserById(id);
 
   if (!user) throw customError("fail", 404, "user is not found!");
 

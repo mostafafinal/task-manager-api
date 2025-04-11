@@ -1,6 +1,6 @@
 import * as service from "../services/taskService";
 import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
-import { TaskModel } from "../types/schemas";
+import { tasks } from "../../src/types/prisma";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
 
@@ -12,13 +12,13 @@ export const createTaskPost: RegularMiddlewareWithoutNext = async (
 
   if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
 
-  const data = matchedData<TaskModel>(req);
+  const data = matchedData<tasks>(req);
 
-  const task: TaskModel = {
+  const task: tasks = {
     ...data,
   };
 
-  const createdTask: TaskModel | undefined = await service.createTask(task);
+  const createdTask = await service.createTask(task);
 
   if (!createdTask) throw customError();
 
@@ -37,9 +37,9 @@ export const getTaskGet: RegularMiddlewareWithoutNext = async (req, res) => {
   const data = matchedData(req);
   delete data.userId;
 
-  const task: TaskModel | undefined = await service.getTask(data.id);
+  const task = await service.getTask(data.id);
 
-  if (!task) throw customError();
+  if (!task) throw customError("fail", 404, "task not found!");
 
   res.status(200).json({ status: "success", data: task });
 };
@@ -65,6 +65,7 @@ export const updateTaskPost: RegularMiddlewareWithoutNext = async (
   res.status(200).json({
     status: "success",
     message: "task updated successfully",
+    data: serviceResult,
   });
 };
 

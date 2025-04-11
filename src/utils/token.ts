@@ -16,7 +16,7 @@ export const generateToken = async (
 
     return token;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 

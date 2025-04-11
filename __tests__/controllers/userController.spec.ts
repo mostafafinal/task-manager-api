@@ -2,12 +2,11 @@ import { faker } from "@faker-js/faker";
 import request, { Response } from "supertest";
 import app from "../../src/index";
 import * as service from "../../src/services/userService";
-import { IUser } from "../../src/types/schemas";
-
-jest.mock("../../src/types/schemas");
+import { users } from "../../src/types/prisma";
 
 describe("User controller suite", () => {
-  const user: Partial<IUser> = {
+  const user: Partial<users> = {
+    id: faker.database.mongodbObjectId(),
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
     email: faker.internet.email(),
@@ -20,8 +19,8 @@ describe("User controller suite", () => {
       .get("/user")
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
-    expect(service.getUserById).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
+    expect(service.getUserById).toHaveBeenCalled();
     expect(res.body.status).toBeDefined();
     expect(res.body.user).toBeDefined();
   });

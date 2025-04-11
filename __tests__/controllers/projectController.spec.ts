@@ -2,27 +2,40 @@ import request, { Response } from "supertest";
 import app from "../../src/index";
 import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/projectService";
-import { ProjectModel } from "../../src/types/schemas";
-import { Types } from "mongoose";
+import { projects, users } from "../../src/types/prisma";
+import { prisma } from "../../src/configs/prisma";
 
+const prismaMock = jest.mocked(prisma);
 jest.mock("../../src/services/projectService");
 
-describe("Project controller testing", () => {
-  const id: Types.ObjectId = new Types.ObjectId(
-    faker.database.mongodbObjectId()
-  );
-  const project: ProjectModel = {
+describe("project controller suite", () => {
+  const user: users = {
+    id: faker.database.mongodbObjectId(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    email: faker.internet.email(),
+    password: faker.internet.password(),
+    createdAt: faker.date.anytime(),
+    updatedAt: faker.date.recent(),
+    v: 0,
+  };
+  const project: projects = {
+    id: faker.database.mongodbObjectId(),
     name: faker.commerce.productName(),
     deadline: faker.date.soon(),
     status: faker.helpers.arrayElement(["active", "completed"]),
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
-    userId: id,
+    userId: faker.database.mongodbObjectId(),
+    createdAt: faker.date.anytime(),
+    updatedAt: faker.date.recent(),
+    v: 0,
   };
 
   afterAll(() => jest.clearAllMocks());
 
   test("create project request", async () => {
+    prismaMock.users.findUnique.mockResolvedValue(user);
     jest.spyOn(service, "createProject").mockResolvedValue(project);
 
     const res: Response = await request(app)
@@ -38,6 +51,7 @@ describe("Project controller testing", () => {
   });
 
   test("get projects request", async () => {
+    prismaMock.users.findUnique.mockResolvedValue(user);
     jest.spyOn(service, "getProjects").mockResolvedValue({
       projects: [project, project] as unknown as [],
       pages: 100,
@@ -55,10 +69,11 @@ describe("Project controller testing", () => {
   });
 
   test("get project by id request", async () => {
+    prismaMock.users.findUnique.mockResolvedValue(user);
     jest.spyOn(service, "getProject").mockResolvedValue(project);
 
     const res: Response = await request(app)
-      .get(`/projects/${id}`)
+      .get(`/projects/${project.id}`)
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.getProject).toHaveBeenCalled();
@@ -67,11 +82,12 @@ describe("Project controller testing", () => {
   });
 
   test("update project request", async () => {
+    prismaMock.users.findUnique.mockResolvedValue(user);
     const newDes = faker.commerce.productDescription();
-    jest.spyOn(service, "updateProject").mockResolvedValue(true);
+    jest.spyOn(service, "updateProject").mockResolvedValue(project);
 
     const res: Response = await request(app)
-      .put(`/projects/${id}`)
+      .put(`/projects/${project.id}`)
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
       .send({
         description: newDes,
@@ -84,10 +100,11 @@ describe("Project controller testing", () => {
   });
 
   test("delete project request", async () => {
-    jest.spyOn(service, "deleteProject").mockResolvedValue(true);
+    prismaMock.users.findUnique.mockResolvedValue(user);
+    jest.spyOn(service, "deleteProject").mockResolvedValue(project);
 
     const res: Response = await request(app)
-      .delete(`/projects/${id}`)
+      .delete(`/projects/${project.id}`)
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.deleteProject).toHaveBeenCalled();

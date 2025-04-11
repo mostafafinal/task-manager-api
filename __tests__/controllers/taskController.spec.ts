@@ -2,28 +2,41 @@ import request, { Response } from "supertest";
 import app from "../../src/index";
 import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/taskService";
-import { TaskModel } from "../../src/types/schemas";
-import { Types } from "mongoose";
+import { prisma } from "../../src/configs/prisma";
+import { tasks, users } from "../../src/types/prisma";
 
+const prismaMock = jest.mocked(prisma);
 jest.mock("../../src/services/taskService");
 
 describe("Task controller testing", () => {
-  const id: Types.ObjectId = new Types.ObjectId(
-    faker.database.mongodbObjectId()
-  );
-  const task: TaskModel = {
+  const user: users = {
+    id: faker.database.mongodbObjectId(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    email: faker.internet.email(),
+    password: faker.internet.password(),
+    createdAt: faker.date.anytime(),
+    updatedAt: faker.date.recent(),
+    v: 0,
+  };
+  const task: tasks = {
+    id: faker.database.mongodbObjectId(),
     name: faker.commerce.productName(),
     deadline: faker.date.soon(),
     status: faker.helpers.arrayElement(["todo", "in-progress", "completed"]),
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
-    projectId: id,
-    userId: id,
+    projectId: faker.database.mongodbObjectId(),
+    userId: faker.database.mongodbObjectId(),
+    createdAt: faker.date.anytime(),
+    updatedAt: faker.date.recent(),
+    v: 0,
   };
 
   afterAll(() => jest.clearAllMocks());
 
   test("create task request", async () => {
+    prismaMock.users.findUnique.mockResolvedValue(user);
     jest.spyOn(service, "createTask").mockResolvedValue(task);
 
     const res: Response = await request(app)
@@ -39,10 +52,11 @@ describe("Task controller testing", () => {
   });
 
   test("get task by id request", async () => {
+    prismaMock.users.findUnique.mockResolvedValue(user);
     jest.spyOn(service, "getTask").mockResolvedValue(task);
 
     const res: Response = await request(app)
-      .get(`/tasks/${id}`)
+      .get(`/tasks/${task.id}`)
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.getTask).toHaveBeenCalled();
@@ -53,10 +67,11 @@ describe("Task controller testing", () => {
 
   test("update task request", async () => {
     const newDes = faker.commerce.productDescription();
-    jest.spyOn(service, "updateTask").mockResolvedValue(true);
+    prismaMock.users.findUnique.mockResolvedValue(user);
+    jest.spyOn(service, "updateTask").mockResolvedValue(task);
 
     const res: Response = await request(app)
-      .put(`/tasks/${id}`)
+      .put(`/tasks/${task.id}`)
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
       .send({
         newData: {
@@ -71,10 +86,11 @@ describe("Task controller testing", () => {
   });
 
   test("delete task request", async () => {
-    jest.spyOn(service, "deleteTask").mockResolvedValue(true);
+    prismaMock.users.findUnique.mockResolvedValue(user);
+    jest.spyOn(service, "deleteTask").mockResolvedValue(task);
 
     const res: Response = await request(app)
-      .delete(`/tasks/${id}`)
+      .delete(`/tasks/${task.id}`)
       .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
 
     expect(service.deleteTask).toHaveBeenCalled();

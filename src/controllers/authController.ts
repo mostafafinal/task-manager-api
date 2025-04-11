@@ -1,12 +1,11 @@
-import * as authService from "../services/authService";
+import * as service from "../services/authService";
 import {
   RegularMiddleware,
   RegularMiddlewareWithoutNext,
 } from "../types/expressMiddleware";
 import passport, { AuthenticateCallback } from "passport";
-import { IUser } from "../types/schemas";
+import { users } from "../types/prisma";
 import { NextFunction, Request, Response } from "express";
-import { HydratedDocument } from "mongoose";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
 
@@ -18,7 +17,7 @@ export const signUp: RegularMiddlewareWithoutNext = async (req, res) => {
   const data = matchedData(req);
   delete data.confirmPassword;
 
-  const result = await authService.registerUser({ ...data } as IUser);
+  const result = await service.registerUser(data as users);
 
   if (!result) throw customError("fail", 500, "failed to register!");
 
@@ -47,7 +46,7 @@ export const loginLocal: RegularMiddleware[] = [
         return next(customError("fail", 400, "incorrect email or password"));
       }
 
-      req.user = user as HydratedDocument<IUser>;
+      req.user = user;
 
       next();
     } as AuthenticateCallback)(req, res, next);
@@ -80,7 +79,7 @@ export const forgetPasswordPost: RegularMiddlewareWithoutNext = async (
 
   const email: string = matchedData(req).email;
 
-  await authService.forgetPassword(email);
+  await service.forgetPassword(email);
 
   res.status(200).json({
     status: "success",
@@ -89,7 +88,7 @@ export const forgetPasswordPost: RegularMiddlewareWithoutNext = async (
 };
 
 export const logout: RegularMiddlewareWithoutNext = async (req, res) => {
-  req.user = {} as HydratedDocument<IUser>;
+  req.user = {};
 
   res
     .status(204)
