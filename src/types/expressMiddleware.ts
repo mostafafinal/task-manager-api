@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { IUser } from "./schemas";
-import { HydratedDocument } from "mongoose";
+import { users } from "./prisma";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
-      user?: HydratedDocument<IUser>;
+      user?: Partial<users>;
     }
   }
 }
