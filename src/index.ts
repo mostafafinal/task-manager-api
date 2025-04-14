@@ -1,13 +1,11 @@
 import express from "express";
-import { config } from "dotenv";
 import cors from "cors";
 import { appOpt } from "./configs/corsOpts";
 import cookieParser from "cookie-parser";
 import "./configs/passport";
 import indexRouter from "./routes/indexRouter";
 import { errorHandler } from "./middlewares/errorHandler";
-
-config();
+import { ENV_VARS } from "./configs/envs";
 
 const app = express();
 
@@ -21,6 +19,6 @@ app.use("/", indexRouter);
 
 app.use(errorHandler);
 
-app.listen(process.env.PORT, () => console.log("connected"));
+app.listen(ENV_VARS.PORT, () => console.log("connected"));
 
 export default app;

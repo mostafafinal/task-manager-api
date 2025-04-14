@@ -4,6 +4,7 @@ import { users } from "../types/prisma";
 import { generateToken } from "../utils/token";
 import { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 import { resetPasswordEmail } from "../utils/mail";
+import { ENV_VARS } from "../configs/envs";
 
 export type RegisterUser = (data: users) => Promise<boolean | undefined>;
 
@@ -69,7 +70,7 @@ export const forgetPassword: ForgetPassword = async (userEmail) => {
     if (!userId) throw new Error("user's not existed!");
 
     const payload: JwtPayload = userId;
-    const secret = process.env.JWT_SECRET as Secret;
+    const secret = ENV_VARS.JWT_SECRET as Secret;
     const options: SignOptions = {
       algorithm: "HS256",
       expiresIn: "5d",
@@ -77,10 +78,10 @@ export const forgetPassword: ForgetPassword = async (userEmail) => {
 
     const token = await generateToken(payload, secret, options);
 
-    const domain: string = `${process.env.REDIRECT_DOMAIN}/user/resetpassword/${token}`;
+    const domain: string = `${ENV_VARS.FRONTEND_URL}/user/resetpassword/${token}`;
 
     await resetPasswordEmail(
-      process.env.EMAIL_SENDER as string,
+      ENV_VARS.EMAIL_SENDER as string,
       userEmail,
       domain
     );

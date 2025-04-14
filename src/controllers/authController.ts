@@ -8,6 +8,7 @@ import { users } from "../types/prisma";
 import { NextFunction, Request, Response } from "express";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
+import { ENV_VARS } from "../configs/envs";
 
 export const signUp: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
@@ -65,7 +66,7 @@ export const loginGoogleCB: RegularMiddleware[] = [
     session: false,
   }),
   (req, res) => {
-    res.redirect(process.env.FRONTEND_URL || "/");
+    res.redirect(ENV_VARS.FRONTEND_URL || "/");
   },
 ];
 

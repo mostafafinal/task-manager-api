@@ -3,6 +3,7 @@ import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
 import { generateToken } from "../utils/token";
+import { ENV_VARS } from "../configs/envs";
 
 export const assignToken: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
@@ -14,7 +15,7 @@ export const assignToken: RegularMiddlewareWithoutNext = async (req, res) => {
   const payload: JwtPayload = {
     id: userId,
   };
-  const secret = process.env.JWT_SECRET as Secret;
+  const secret = ENV_VARS.JWT_SECRET as Secret;
   const options: SignOptions = {
     algorithm: "HS256",
     expiresIn: "1d",

@@ -4,6 +4,7 @@ import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/taskService";
 import { prisma } from "../../src/configs/prisma";
 import { tasks, users } from "../../src/types/prisma";
+import { ENV_VARS } from "../../src/configs/envs";
 
 const prismaMock = jest.mocked(prisma);
 jest.mock("../../src/services/taskService");
@@ -41,7 +42,7 @@ describe("Task controller testing", () => {
 
     const res: Response = await request(app)
       .post("/tasks")
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`)
       .send({ ...task });
 
     expect(service.createTask).toHaveBeenCalled();
@@ -57,7 +58,7 @@ describe("Task controller testing", () => {
 
     const res: Response = await request(app)
       .get(`/tasks/${task.id}`)
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`);
 
     expect(service.getTask).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
@@ -72,7 +73,7 @@ describe("Task controller testing", () => {
 
     const res: Response = await request(app)
       .put(`/tasks/${task.id}`)
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`)
       .send({
         newData: {
           description: newDes,
@@ -91,7 +92,7 @@ describe("Task controller testing", () => {
 
     const res: Response = await request(app)
       .delete(`/tasks/${task.id}`)
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`);
 
     expect(service.deleteTask).toHaveBeenCalled();
     expect(res.statusCode).toEqual(204);

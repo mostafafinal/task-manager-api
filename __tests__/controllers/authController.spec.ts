@@ -4,6 +4,7 @@ import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/authService";
 import { prisma } from "../../src/configs/prisma";
 import { users } from "../../src/types/prisma";
+import { ENV_VARS } from "../../src/configs/envs";
 
 const prismaMock = jest.mocked(prisma);
 jest.mock("../../src/services/authService");
@@ -54,7 +55,7 @@ describe("authentication controller suite", () => {
 
     const res = await request(app)
       .delete("/auth/logout")
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`);
 
     expect(res.status).toEqual(204);
   });

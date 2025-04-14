@@ -1,7 +1,4 @@
 import { JwtPayload, Secret, SignOptions, sign, verify } from "jsonwebtoken";
-import { config } from "dotenv";
-
-config();
 
 export const generateToken = async (
   payload: JwtPayload,

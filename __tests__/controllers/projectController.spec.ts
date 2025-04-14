@@ -4,6 +4,7 @@ import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/projectService";
 import { projects, users } from "../../src/types/prisma";
 import { prisma } from "../../src/configs/prisma";
+import { ENV_VARS } from "../../src/configs/envs";
 
 const prismaMock = jest.mocked(prisma);
 jest.mock("../../src/services/projectService");
@@ -41,7 +42,7 @@ describe("project controller suite", () => {
     const res: Response = await request(app)
       .post("/projects")
       .send({ ...project })
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`);
 
     expect(service.createProject).toHaveBeenCalled();
     expect(res.statusCode).toEqual(201);
@@ -59,7 +60,7 @@ describe("project controller suite", () => {
 
     const res: Response = await request(app)
       .get("/projects")
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`)
       .query({ page: "1", limit: "10" });
 
     expect(service.getProjects).toHaveBeenCalled();
@@ -74,7 +75,7 @@ describe("project controller suite", () => {
 
     const res: Response = await request(app)
       .get(`/projects/${project.id}`)
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`);
 
     expect(service.getProject).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
@@ -88,7 +89,7 @@ describe("project controller suite", () => {
 
     const res: Response = await request(app)
       .put(`/projects/${project.id}`)
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`)
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`)
       .send({
         description: newDes,
       });
@@ -105,7 +106,7 @@ describe("project controller suite", () => {
 
     const res: Response = await request(app)
       .delete(`/projects/${project.id}`)
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`);
 
     expect(service.deleteProject).toHaveBeenCalled();
     expect(res.statusCode).toEqual(204);

@@ -3,6 +3,7 @@ import { prisma } from "../configs/prisma";
 import * as bcrypt from "../utils/bcryption";
 import { verifyToken } from "../utils/token";
 import { JwtPayload, Secret } from "jsonwebtoken";
+import { ENV_VARS } from "../configs/envs";
 
 export type GetUserById = (
   userId: string
@@ -85,7 +86,7 @@ export const resetUserPassword: ResetUserPassword = async (
 
     const payload = (await verifyToken(
       token,
-      process.env.JWT_SECRET as Secret
+      ENV_VARS.JWT_SECRET as Secret
     )) as unknown as JwtPayload;
 
     if (!payload) throw new Error("invalid token");

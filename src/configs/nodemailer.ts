@@ -1,8 +1,6 @@
 import { createTransport, Transporter } from "nodemailer";
 import { Options } from "nodemailer/lib/smtp-transport";
-import { config } from "dotenv";
-
-config();
+import { ENV_VARS } from "./envs";
 
 const transprotOpts: Options = {
   service: "gmail",
@@ -10,8 +8,8 @@ const transprotOpts: Options = {
   port: 465,
   secure: true,
   auth: {
-    user: process.env.EMAIL_SENDER_USERNAME,
-    pass: process.env.EMAIL_SENDER_PASSWORD,
+    user: ENV_VARS.EMAIL_SENDER_USERNAME,
+    pass: ENV_VARS.EMAIL_SENDER_PASSWORD,
   },
 };
 

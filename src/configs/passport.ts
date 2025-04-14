@@ -17,14 +17,12 @@ import {
 } from "passport-jwt";
 import { loginUser } from "../services/authService";
 import { prisma } from "./prisma";
-import { config } from "dotenv";
-
-config();
+import { ENV_VARS } from "./envs";
 
 const googleOpts: StrategyOptions = {
-  clientID: process.env.GOOGLE_CLIENT_ID as string,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-  callbackURL: process.env.GOOGLE_CB_URL as string,
+  clientID: ENV_VARS.GOOGLE_CLIENT_ID as string,
+  clientSecret: ENV_VARS.GOOGLE_CLIENT_SECRET as string,
+  callbackURL: ENV_VARS.GOOGLE_CB_URL as string,
 };
 
 const googleVerifyCallback: GoogleVerifyCB = async (
@@ -91,7 +89,7 @@ const localStrategy: LocalStrategy = new LocalStrategy(
 
 const jwtOpts: StrategyOptionsWithoutRequest = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET as string,
+  secretOrKey: ENV_VARS.JWT_SECRET as string,
 };
 
 const jwtVerifyUserCallback: VerifyCallback = async (payload, done) => {

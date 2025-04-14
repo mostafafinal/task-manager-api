@@ -1,10 +1,8 @@
 import { CorsOptions } from "cors";
-import { config } from "dotenv";
-
-config();
+import { ENV_VARS } from "./envs";
 
 export const appOpt: CorsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: ENV_VARS.FRONTEND_URL || "http://localhost:5173",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],

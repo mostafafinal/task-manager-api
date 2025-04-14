@@ -3,6 +3,7 @@ import request, { Response } from "supertest";
 import app from "../../src/index";
 import * as service from "../../src/services/userService";
 import { users } from "../../src/types/prisma";
+import { ENV_VARS } from "../../src/configs/envs";
 
 describe("User controller suite", () => {
   const user: Partial<users> = {
@@ -17,7 +18,7 @@ describe("User controller suite", () => {
 
     const res: Response = await request(app)
       .get("/user")
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`);
 
     expect(res.statusCode).toEqual(200);
     expect(service.getUserById).toHaveBeenCalled();
@@ -38,7 +39,7 @@ describe("User controller suite", () => {
         newPassword: newPassMock,
         confirmPassword: newPassMock,
       })
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`);
 
     expect(service.changeUserPassword).toHaveBeenCalled();
     expect(res.statusCode).toEqual(201);
@@ -68,7 +69,7 @@ describe("User controller suite", () => {
 
     const res: Response = await request(app)
       .delete("/user/deleteaccount")
-      .set("Cookie", `x-auth-token=${process.env.JWT_SIGNED_TOKEN}`);
+      .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`);
 
     expect(service.deleteUserById).toHaveBeenCalled();
     expect(res.statusCode).toEqual(204);
