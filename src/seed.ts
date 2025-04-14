@@ -1,36 +1,71 @@
-import { users, projects, tasks } from "../types/prisma";
+import { users, projects, tasks } from "../src/types/prisma";
 import { faker } from "@faker-js/faker";
 import { prisma } from "./configs/prisma";
 import { hashPassword } from "./utils/bcryption";
 
-// forgot that fakerjs has a similar helper!
-// const randomizer = (
-//   arrOfElements: string[],
-//   elementsNumToReturn?: number
-// ): string | string[] | undefined => {
-//   try {
-//     if (!arrOfElements || arrOfElements.length <= 0)
-//       throw new Error("Either invalid array type or empty array");
+/*!
+ * @file seed.ts
+ * @author Mostafa Hasan (mostafafinal55@gmail.com)
+ * @summary
+ *  This file declares a combination of seeding funtions
+ *  they are responsible for seeding a fake and demo data
+ *  to the database for local development use cases
+ * @version 1.0.0
+ * @date 2025-04-09
+ * @copyright Copyrights (c) 2025
+ */
 
-//     if (elementsNumToReturn) {
-//       const returnedElements: string[] = [];
+/**
+ * Randomizer util is for selecting any random element/elements
+ * from a given array of elements and return it/them
+ * @param arrOfElements an array of elements
+ * @param elementsNumToReturn  number of random elements to be selected from the array
+ * @default one element would be returned
+ * @returns random element/elements
+ * @deprecated faker-js provides a similar built-in API method
+ */
 
-//       for (let i = 0; i < elementsNumToReturn; i++) {
-//         returnedElements.push(
-//           arrOfElements[Math.floor(Math.random() * arrOfElements.length)]
-//         );
-//       }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const randomizer = (
+  arrOfElements: string[],
+  elementsNumToReturn?: number
+): string | string[] | undefined => {
+  try {
+    if (!arrOfElements || arrOfElements.length <= 0)
+      throw new Error("Either invalid array type or empty array");
 
-//       return returnedElements;
-//     }
+    if (elementsNumToReturn) {
+      const returnedElements: string[] = [];
 
-//     return arrOfElements[Math.floor(Math.random() * arrOfElements.length)];
-//   } catch (error) {
-//     console.error(error);
+      for (let i = 0; i < elementsNumToReturn; i++) {
+        returnedElements.push(
+          arrOfElements[Math.floor(Math.random() * arrOfElements.length)]
+        );
+      }
 
-//     process.exit(0);
-//   }
-// };
+      return returnedElements;
+    }
+
+    return arrOfElements[Math.floor(Math.random() * arrOfElements.length)];
+  } catch (error) {
+    console.error(error);
+
+    process.exit(0);
+  }
+};
+
+/**
+ * @description
+ *  FakeTaskData seed function seeds fake & demo tasks data
+ *  for local development use cases
+ * @function Prisma createMany API would be used for seeding
+ *  seeding tasks' data to the database
+ * @param tasksVolume number of tasks the user would have
+ * @param projectId project id that own those tasks
+ * @param userId user id that would own those tasks
+ * @return void => tasks have been seeded
+ * @throws error => invalided provided params
+ */
 
 const fakeTaskData = async (
   tasksVolume: number,
@@ -62,6 +97,23 @@ const fakeTaskData = async (
     process.exit(0);
   }
 };
+
+/**
+ * @description
+ *  FakeProjectData seed function seeds fake & demo projects data
+ *  for local development use cases, it calls fakeTaskData function
+ *  for seeding the projects' tasks
+ *
+ * @function fakeTaskData would be called for each project task seeding
+ * @function Prisma createMany API would be used for seeding
+ *  seeding projects' data to the database
+ *
+ * @param projectsVolume number of projects the user would have
+ * @param userId user id that own those projects
+ * @param tasksPerProjectVolume number of tasks that each project would have
+ * @return void => projects have been generated
+ * @throws error => invalided provided params
+ */
 
 const fakeProjectData = async (
   projectsVolume: number,
@@ -103,6 +155,23 @@ const fakeProjectData = async (
   }
 };
 
+/**
+ * @description
+ *  FakeUserData seed function generates fake & demo user data
+ *  for local development use cases, it calls fakeProjectData
+ *  seed function for seeding the users' projects
+ *
+ * @function Prisma createMany API would be used for seeding
+ *  seeding users' data to the database
+ * @function fakeProjectData would be called for each user seeding
+ *
+ * @param usersVolume number of users would seeded
+ * @param projectsPerUserVolume number of projects would be seeded for each user
+ * @param tasksPerProjectVolume  number of tasks would be seeded for each project
+ * @return void => users have been seeded
+ * @throws error => invalided provided params
+ */
+
 const fakeUserData = async (
   usersVolume: number,
   projectsPerUserVolume: number,
@@ -140,6 +209,22 @@ const fakeUserData = async (
     console.error(error);
   }
 };
+
+/**
+ * @description
+ *  Seed function seeds fake & demo data into local databases
+ *  for local development use cases, it calls fakeUserData
+ *  seed function for seeding users, projects, and tasks
+ *
+ * @function prisma APIs would be called for garbage collecting any old schema data
+ * @function fakeUserData would be called for each users, projects, and tasks seeding
+ *
+ * @param usersVolume number of users would seeded
+ * @param projectsPerUserVolume number of projects would be seeded for each user
+ * @param tasksPerProjectVolume  number of tasks would be seeded for each project
+ * @return void => database's been seeded
+ * @throws error => invalided provided params or database connection
+ */
 
 const seed = async (
   usersVolume: number = 10,

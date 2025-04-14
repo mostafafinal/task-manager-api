@@ -1,7 +1,7 @@
 import { prisma } from "../configs/prisma";
 import { Prisma } from "../types/prisma";
 
-/**
+/*!
  * @file countModelFields.ts
  * @author Mostafa Hasan (mostafafinal55@gmail.com)
  * @summary
@@ -28,10 +28,10 @@ export type ValidateModel = (
  *  checks if the model is existed in the schema, and if
  *  the model validation passed it would check if the provided
  *  field/fields are existed in the model
- * @param modelName
- * @param fields
+ * @param modelName existed schema model name i.e. projects, tasks, users
+ * @param fields model field/fields e.g. status, priority
  * @returns true if the model and its field/fields are valid
- * @returns undefined if either the model or its field/fields are invalid
+ * @throws error if either the model or its field/fields are invalid
  */
 
 export const validateModel: ValidateModel = (modelName, ...fields) => {
@@ -70,9 +70,9 @@ type CountModelFields = (
  *  and its field/fields validation. uses @function groupBy prisma aggrigation API
  *  to count the provided model field/fields
  *
- * @param userId
- * @param modelName
- * @param fields
+ * @param userId user id i.e. f5481e874b20dbb1a6b8995d (for mongoDB database)
+ * @param modelName existed schema model name i.e. projects, tasks, users
+ * @param fields model field/fields e.g. status, priority
  * @returns { "0": { _count: number, field: specific data} } for a single field
  * @returns { "0": { _count: number, field A: specific data, field B: specific data} } in parallel
  */

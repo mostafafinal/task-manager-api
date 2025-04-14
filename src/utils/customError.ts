@@ -1,4 +1,4 @@
-/**
+/*!
  * @file customError.ts
  * @author Mostafa Hasan (mostafafinal55@gmail.com)
  * @summary
@@ -24,11 +24,11 @@ export interface CustomError extends Error {
  *  custom error properties for it. finallay it returns
  *  the customized error to be used in multiple cases
  *  e.g. router handlers, global handlers.
- * @param status
- * @param statusCode
- * @param message
- * @param data
- * @param details
+ * @param status i.e. fail, error
+ * @param statusCode HTTP error status code i.e. 500, 400, 401, 404
+ * @param message error massage e.g. enternal server error
+ * @param data e.g. error data related or null
+ * @param details e.g. error datails for development help or null
  * @returns { status: fail, statusCode: 500, data: internal server error, details: ..etc} JSON HTTP Error
  */
 
