@@ -8,7 +8,7 @@ import { ENV_VARS } from "../configs/envs";
 export const assignToken: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const userId = matchedData(req).userId;
 
@@ -23,7 +23,7 @@ export const assignToken: RegularMiddlewareWithoutNext = async (req, res) => {
 
   const token = await generateToken(payload, secret, options);
 
-  if (!token) throw customError("fail");
+  if (!token) throw customError("fatal");
 
   res.cookie("x-auth-token", token, {
     maxAge: 1000 * 60 * 60 * 24 * 3,

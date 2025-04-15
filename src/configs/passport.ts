@@ -18,6 +18,7 @@ import {
 import { loginUser } from "../services/authService";
 import { prisma } from "./prisma";
 import { ENV_VARS } from "./envs";
+import { logger } from "../utils/logger";
 
 const googleOpts: StrategyOptions = {
   clientID: ENV_VARS.GOOGLE_CLIENT_ID as string,
@@ -48,6 +49,7 @@ const googleVerifyCallback: GoogleVerifyCB = async (
 
     done(null, user);
   } catch (error) {
+    logger.error(error, "GOOGLE VERIFY CALLBACK EXCEPTION");
     done(error, false);
   }
 };
@@ -78,6 +80,7 @@ const localVerifyCallback: VerifyFunction = async (
 
     return done(null, user);
   } catch (error) {
+    logger.error(error, "LOCAL VERIFY CALLBACK EXCEPTION");
     done(error, false);
   }
 };
@@ -92,7 +95,7 @@ const jwtOpts: StrategyOptionsWithoutRequest = {
   secretOrKey: ENV_VARS.JWT_SECRET as string,
 };
 
-const jwtVerifyUserCallback: VerifyCallback = async (payload, done) => {
+const jwtVerifyCallback: VerifyCallback = async (payload, done) => {
   try {
     if (!payload.id || payload.id.length !== 24) return done(null, false);
 
@@ -106,14 +109,12 @@ const jwtVerifyUserCallback: VerifyCallback = async (payload, done) => {
 
     return done(null, user);
   } catch (error) {
-    return done(error, false);
+    logger.error(error, "JWT VERIFY CALLBACK EXCEPTION");
+    done(error, false);
   }
 };
 
-const jwtStrategy: JwtStrategy = new JwtStrategy(
-  jwtOpts,
-  jwtVerifyUserCallback
-);
+const jwtStrategy: JwtStrategy = new JwtStrategy(jwtOpts, jwtVerifyCallback);
 
 passport.use(localStrategy);
 passport.use(googleStrategy);
