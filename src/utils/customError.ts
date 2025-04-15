@@ -11,8 +11,10 @@
  * @copyright Copyrights (c) 2025
  */
 
+import { PinoErrorType } from "../types/pino";
+
 export interface CustomError extends Error {
-  status: string;
+  status: PinoErrorType;
   statusCode: number;
   data: unknown;
   details: unknown;
@@ -24,7 +26,7 @@ export interface CustomError extends Error {
  *  custom error properties for it. finallay it returns
  *  the customized error to be used in multiple cases
  *  e.g. router handlers, global handlers.
- * @param status i.e. fail, error
+ * @param status i.e. "info" | "error" | "fatal"
  * @param statusCode HTTP error status code i.e. 500, 400, 401, 404
  * @param message error massage e.g. enternal server error
  * @param data e.g. error data related or null
@@ -33,7 +35,7 @@ export interface CustomError extends Error {
  */
 
 export const customError = (
-  status: string = "fail",
+  status: PinoErrorType,
   statusCode: number = 500,
   message: string = "internal server error",
   data: unknown = null,
