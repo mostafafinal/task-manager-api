@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { users } from "./prisma";
+import { CustomError } from "../utils/customError";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -16,6 +17,13 @@ export type RegularMiddlewareWithoutNext = (
 ) => Promise<void>;
 
 export type RegularMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => Promise<void>;
+
+export type ErrorMiddleware = (
+  error: CustomError,
   req: Request,
   res: Response,
   next: NextFunction

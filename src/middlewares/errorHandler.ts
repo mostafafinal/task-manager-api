@@ -1,12 +1,11 @@
-import { NextFunction, Request, Response } from "express";
-import { CustomError } from "../utils/customError";
+import { ErrorMiddleware } from "../types/expressMiddleware";
 
-export const errorHandler = (
-  error: CustomError,
-  req: Request,
-  res: Response,
+export const errorHandler: ErrorMiddleware = async (
+  error,
+  req,
+  res,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction
+  next
 ) => {
   res.status(error.statusCode).json({
     status: error.status,
