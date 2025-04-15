@@ -1,6 +1,6 @@
-/*!
+/**
  * @file logger.ts
- * @author Mostafa Hasan (mostafafinal55@gmail.com)
+ * @author Mostafa Hasan // (mostafafinal55@gmail.com)
  * @summary
  *  This file declares httpErrorLogger & Logger utilities
  *  they are responsible for logging http error responses
@@ -31,6 +31,7 @@ type HttpErrorLogger = (error: CustomError) => void;
  * @param error custom error object (has pino related error type e.g. info, error)
  * @log pino pretty error
  * @exception invalid pino error types
+ * @example httpErrorLogger({status: "fatal", statusCode: 500, message: "internal server error", ..etc: "etc"})
  */
 
 export const httpErrorLogger: HttpErrorLogger = (error) => {

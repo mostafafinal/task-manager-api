@@ -1,9 +1,6 @@
-import { prisma } from "../configs/prisma";
-import { Prisma } from "../types/prisma";
-
-/*!
+/**
  * @file countModelFields.ts
- * @author Mostafa Hasan (mostafafinal55@gmail.com)
+ * @author Mostafa Hasan // (mostafafinal55@gmail.com)
  * @summary
  *  This file declares validateModel & countModelFields utils
  *  they are responsible for dynamically validating any existed model and its field/fields
@@ -16,6 +13,10 @@ import { Prisma } from "../types/prisma";
  * @date 2025-04-14
  * @copyright Copyrights (c) 2025
  */
+
+import { prisma } from "../configs/prisma";
+import { Prisma } from "../types/prisma";
+import { logger } from "./logger";
 
 export type ValidateModel = (
   modelName: Prisma.TypeMap["meta"]["modelProps"],
@@ -32,6 +33,7 @@ export type ValidateModel = (
  * @param fields model field/fields e.g. status, priority
  * @returns true if the model and its field/fields are valid
  * @throws error if either the model or its field/fields are invalid
+ * @example validateModel("projects", ["status", "priority"])
  */
 
 export const validateModel: ValidateModel = (modelName, ...fields) => {
@@ -54,7 +56,7 @@ export const validateModel: ValidateModel = (modelName, ...fields) => {
 
     return true;
   } catch (error) {
-    console.error(error);
+    logger.error(error, "VALIDATE MODEL UTIL EXCEPTION");
   }
 };
 
@@ -75,6 +77,7 @@ type CountModelFields = (
  * @param fields model field/fields e.g. status, priority
  * @returns { "0": { _count: number, field: specific data} } for a single field
  * @returns { "0": { _count: number, field A: specific data, field B: specific data} } in parallel
+ * @example countModelFields("user-id", "projects", ["status", "priority"])
  */
 
 export const countModelFields: CountModelFields = async (
@@ -95,6 +98,6 @@ export const countModelFields: CountModelFields = async (
 
     return { ...data };
   } catch (error) {
-    console.error(error);
+    logger.error(error, "COUNT MODEL FIELDS UTIL EXCEPTION");
   }
 };
