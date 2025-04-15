@@ -1,4 +1,5 @@
 import express from "express";
+import helmet from "helmet";
 import cors from "cors";
 import { appOpt } from "./configs/corsOpts";
 import cookieParser from "cookie-parser";
@@ -10,6 +11,7 @@ import { errorLogger } from "./middlewares/errorLogger";
 
 const app = express();
 
+app.use(helmet());
 app.use(cors(appOpt));
 
 app.use(express.json());
