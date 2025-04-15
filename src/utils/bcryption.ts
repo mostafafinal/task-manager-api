@@ -16,8 +16,9 @@ import { logger } from "./logger";
 export type HashPassword = (password: string) => Promise<string | undefined>;
 
 /**
- * HashPassword util hashes any provided password
- * to an unhashed password string for security purposes
+ * @description
+ *  HashPassword util hashes any provided password
+ *  to an unhashed password string for security purposes
  *
  * @method hash bcrypt method would be used for hashing passwords
  *
@@ -44,8 +45,9 @@ export type VerifyPassword = (
 ) => Promise<boolean | undefined>;
 
 /**
- * VerifyPassword util verifies any provided password
- * and check if it had been hashed by bcrypt hash method or not
+ * @description
+ *  VerifyPassword util verifies any provided password
+ *  and check if it had been hashed by bcrypt hash method or not
  *
  * @method compare bcrypt method would be used for verifying hashed passwords
  *

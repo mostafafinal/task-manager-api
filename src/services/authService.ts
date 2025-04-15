@@ -62,12 +62,10 @@ type LoginUser = (data: Partial<users>) => Promise<users | undefined>;
 
 /**
  * @description
- *  LoginUser service logs user in and checks
- *  if the provided credentials is correct
+ *  LoginUser service checks if the provided user credentials are correct
  *
  * @function verifyPassword util would be used for verifying user password
- *
- * @function prisma API would be used to register user into the databases
+ * @function prisma API would be used to search user in the databases
  *
  * @param userData user credentials
  * @returns logged in user profile data

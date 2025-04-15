@@ -15,6 +15,7 @@ import { MailOptions } from "nodemailer/lib/json-transport";
 import { logger } from "./logger";
 
 /**
+ * @description
  *  Reset password email util sends a reset password email
  *  to the user who forgot or requested to reset, it would
  *  contain a URL to be used in order to reset user password
