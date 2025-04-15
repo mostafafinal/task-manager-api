@@ -1,11 +1,6 @@
-import { users, projects, tasks } from "../src/types/prisma";
-import { faker } from "@faker-js/faker";
-import { prisma } from "./configs/prisma";
-import { hashPassword } from "./utils/bcryption";
-
-/*!
+/**
  * @file seed.ts
- * @author Mostafa Hasan (mostafafinal55@gmail.com)
+ * @author Mostafa Hasan // (mostafafinal55@gmail.com)
  * @summary
  *  This file declares a combination of seeding funtions
  *  they are responsible for seeding a fake and demo data
@@ -15,6 +10,11 @@ import { hashPassword } from "./utils/bcryption";
  * @copyright Copyrights (c) 2025
  */
 
+import { users, projects, tasks } from "../src/types/prisma";
+import { faker } from "@faker-js/faker";
+import { prisma } from "./configs/prisma";
+import { hashPassword } from "./utils/bcryption";
+
 /**
  * Randomizer util is for selecting any random element/elements
  * from a given array of elements and return it/them
@@ -22,6 +22,7 @@ import { hashPassword } from "./utils/bcryption";
  * @param elementsNumToReturn  number of random elements to be selected from the array
  * @default one element would be returned
  * @returns random element/elements
+ * @example randomizer(["low", "moderate", "high"], 2)
  * @deprecated faker-js provides a similar built-in API method
  */
 
@@ -65,6 +66,7 @@ const randomizer = (
  * @param userId user id that would own those tasks
  * @return void => tasks have been seeded
  * @throws error => invalided provided params
+ * @example fakeTaskData(10, "project-id", "user-id")
  */
 
 const fakeTaskData = async (
@@ -113,6 +115,7 @@ const fakeTaskData = async (
  * @param tasksPerProjectVolume number of tasks that each project would have
  * @return void => projects have been generated
  * @throws error => invalided provided params
+ * @example fakeProjectData(20, "user-id", 10)
  */
 
 const fakeProjectData = async (
@@ -170,6 +173,7 @@ const fakeProjectData = async (
  * @param tasksPerProjectVolume  number of tasks would be seeded for each project
  * @return void => users have been seeded
  * @throws error => invalided provided params
+ * @example fakeUserData(100, 20, 10)
  */
 
 const fakeUserData = async (
@@ -188,7 +192,7 @@ const fakeUserData = async (
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          password: await hashPassword("12345678"),
+          password: (await hashPassword("12345678")) as string,
           createdAt: faker.date.anytime(),
           updatedAt: faker.date.recent(),
           v: 0,
@@ -224,6 +228,7 @@ const fakeUserData = async (
  * @param tasksPerProjectVolume  number of tasks would be seeded for each project
  * @return void => database's been seeded
  * @throws error => invalided provided params or database connection
+ * @example seed(100, 20, 10)
  */
 
 const seed = async (

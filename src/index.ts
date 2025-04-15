@@ -6,6 +6,7 @@ import "./configs/passport";
 import indexRouter from "./routes/indexRouter";
 import { errorHandler } from "./middlewares/errorHandler";
 import { ENV_VARS } from "./configs/envs";
+import { errorLogger } from "./middlewares/errorLogger";
 
 const app = express();
 
@@ -17,7 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/", indexRouter);
 
-app.use(errorHandler);
+app.use(errorLogger, errorHandler);
 
 app.listen(ENV_VARS.PORT, () => console.log("connected"));
 

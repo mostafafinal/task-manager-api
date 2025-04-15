@@ -10,14 +10,14 @@ export const createProjectPost: RegularMiddlewareWithoutNext = async (
 ) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData<projects>(req);
 
   const createdProject = await service.createProject(data);
 
   if (!createdProject || Object.keys(createdProject).length <= 0)
-    throw customError();
+    throw customError("fatal");
 
   res.status(201).json({
     status: "success",
@@ -29,7 +29,7 @@ export const createProjectPost: RegularMiddlewareWithoutNext = async (
 export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
 
@@ -39,7 +39,7 @@ export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
     data.limit
   );
 
-  if (!projects) throw customError();
+  if (!projects) throw customError("fatal");
 
   res.status(200).json({
     status: "success",
@@ -50,13 +50,13 @@ export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
 export const getProject: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
 
   const project = await service.getProject(data.id);
 
-  if (!project) throw customError("fail", 404, "project not found!");
+  if (!project) throw customError("error", 404, "project's not found!");
 
   res.status(200).json({ data: project });
 };
@@ -67,7 +67,7 @@ export const updateProjectPost: RegularMiddlewareWithoutNext = async (
 ) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
   delete data.userId;
@@ -81,7 +81,7 @@ export const updateProjectPost: RegularMiddlewareWithoutNext = async (
 
   const serviceResult = await service.updateProject(projectId, newData);
 
-  if (!serviceResult) throw customError();
+  if (!serviceResult) throw customError("fatal");
 
   res.status(200).json({
     status: "success",
@@ -96,13 +96,13 @@ export const deleteProjectPost: RegularMiddlewareWithoutNext = async (
 ) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data: string = matchedData(req).id;
 
   const serviceResult = await service.deleteProject(data);
 
-  if (!serviceResult) throw customError();
+  if (!serviceResult) throw customError("fatal");
 
   res.status(204).end();
 };

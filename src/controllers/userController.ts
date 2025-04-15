@@ -6,13 +6,13 @@ import { matchedData, validationResult } from "express-validator";
 export const getUserGet: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const id = matchedData(req).userId;
 
   const user = await service.getUserById(id);
 
-  if (!user) throw customError("fail", 404, "user is not found!");
+  if (!user) throw customError("error", 404, "user is not found!");
 
   res.status(200).json({ status: "success", user: user });
 };
@@ -23,7 +23,7 @@ export const changePasswordPut: RegularMiddlewareWithoutNext = async (
 ) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
 
@@ -34,7 +34,7 @@ export const changePasswordPut: RegularMiddlewareWithoutNext = async (
   );
 
   if (!serviceResult)
-    throw customError("fail", 500, "failed to change password!");
+    throw customError("fatal", 500, "failed to change password!");
 
   res.status(201).json({
     status: "success",
@@ -48,7 +48,7 @@ export const resetPasswordPut: RegularMiddlewareWithoutNext = async (
 ) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
 
@@ -58,7 +58,7 @@ export const resetPasswordPut: RegularMiddlewareWithoutNext = async (
   );
 
   if (!serviceResult)
-    throw customError("fail", 500, "failed to reset your password!");
+    throw customError("fatal", 500, "failed to reset your password!");
 
   res.status(201).json({
     status: "success",
@@ -75,7 +75,7 @@ export const deleteUserDelete: RegularMiddlewareWithoutNext = async (
   const serviceResult = await service.deleteUserById(id);
 
   if (!serviceResult)
-    throw customError("fail", 500, "failed to delete account!");
+    throw customError("fatal", 500, "failed to delete account!");
 
   res.status(204).json({
     status: "success",

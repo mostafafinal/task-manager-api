@@ -10,7 +10,7 @@ export const createTaskPost: RegularMiddlewareWithoutNext = async (
 ) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData<tasks>(req);
 
@@ -20,7 +20,7 @@ export const createTaskPost: RegularMiddlewareWithoutNext = async (
 
   const createdTask = await service.createTask(task);
 
-  if (!createdTask) throw customError();
+  if (!createdTask) throw customError("fatal");
 
   res.status(201).json({
     status: "success",
@@ -32,14 +32,14 @@ export const createTaskPost: RegularMiddlewareWithoutNext = async (
 export const getTaskGet: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
   delete data.userId;
 
   const task = await service.getTask(data.id);
 
-  if (!task) throw customError("fail", 404, "task not found!");
+  if (!task) throw customError("error", 404, "task not found!");
 
   res.status(200).json({ status: "success", data: task });
 };
@@ -50,7 +50,7 @@ export const updateTaskPost: RegularMiddlewareWithoutNext = async (
 ) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
   delete data.userId;
@@ -60,7 +60,7 @@ export const updateTaskPost: RegularMiddlewareWithoutNext = async (
 
   const serviceResult = await service.updateTask(taskId, data);
 
-  if (!serviceResult) throw customError();
+  if (!serviceResult) throw customError("fatal");
 
   res.status(200).json({
     status: "success",
@@ -75,13 +75,13 @@ export const deleteTaskPost: RegularMiddlewareWithoutNext = async (
 ) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const id = matchedData(req).id;
 
   const serviceResult = await service.deleteTask(id);
 
-  if (!serviceResult) throw customError();
+  if (!serviceResult) throw customError("fatal");
 
   res.status(204).end();
 };

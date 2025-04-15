@@ -13,14 +13,14 @@ import { ENV_VARS } from "../configs/envs";
 export const signUp: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const data = matchedData(req);
   delete data.confirmPassword;
 
   const result = await service.registerUser(data as users);
 
-  if (!result) throw customError("fail", 500, "failed to register!");
+  if (!result) throw customError("error", 409, "failed to register!");
 
   res.status(201).json({
     status: "success",
@@ -33,7 +33,7 @@ export const loginLocal: RegularMiddleware[] = [
     const errors = validationResult(req);
 
     if (!errors.isEmpty())
-      next(customError("fail", 400, errors.array()[0].msg));
+      next(customError("error", 400, errors.array()[0].msg));
 
     next();
   },
@@ -44,7 +44,7 @@ export const loginLocal: RegularMiddleware[] = [
       }
 
       if (!user) {
-        return next(customError("fail", 400, "incorrect email or password"));
+        return next(customError("error", 400, "incorrect email or password"));
       }
 
       req.user = user;
@@ -76,7 +76,7 @@ export const forgetPasswordPost: RegularMiddlewareWithoutNext = async (
 ) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) throw customError("fail", 400, errors.array()[0].msg);
+  if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
   const email: string = matchedData(req).email;
 
