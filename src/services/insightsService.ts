@@ -9,6 +9,7 @@
  * @copyright Copyrights (c) 2025
  */
 
+import { prisma } from "../configs/prisma";
 import { Prisma } from "../types/prisma";
 import { countModelFields } from "../utils/countModelFields";
 import { logger } from "../utils/logger";
@@ -28,7 +29,7 @@ export type GetGeneralInfo = (
  * @description
  *  GetGeneralInfo internal service util provides projects & tasks related insights
  *  e.g. total projects/tasks, projects/tasks' status & priorities for a
- *  specific user. Is used by projectsInsights & tasksInsights services
+ *  specific user. Used by projectsInsights & tasksInsights services
  *
  * @function countModelFields
  *  util would be used for handling
@@ -71,8 +72,78 @@ export const getGeneralInfo: GetGeneralInfo = async (userId, modelName) => {
   }
 };
 
+export interface ProgjectProgressModel {
+  id: Prisma.projectsFieldRefs["id"]["name"];
+  name: Prisma.projectsFieldRefs["name"]["name"];
+  priority: Prisma.projectsFieldRefs["priority"]["name"];
+  status: Prisma.projectsFieldRefs["status"]["name"];
+  progress: number;
+}
+
+export type GetProjectsProgress = (
+  userId: Prisma.projectsFieldRefs["userId"]["name"],
+  priority?: Prisma.projectsFieldRefs["priority"]["name"]
+) => Promise<ProgjectProgressModel[] | undefined>;
+
+/**
+ * @description
+ *  GetProjectsProgress is an intenrnal service util responsible
+ *  for retrieving and calucating each project progress for
+ *  a specific user percentagely. Used by projectsInsight service
+ *
+ * @function prisma API would be used for retrieving user
+ *  projects data & their related tasks
+ *
+ * @param userId to determine related projects' user
+ * @param priority optional, if defined each project's
+ *  progress would be determined based on its priority
+ * @return array that contains each project data
+ *  and progress
+ * @example
+ *  getProjectsProgress("user-id") // {id: "project-id", name: "prokect-name", prioirity: "high", status: "active", progress: 0}
+ */
+
+export const getProjectsProgress: GetProjectsProgress = async (
+  userId,
+  priority
+) => {
+  try {
+    if (!userId || userId.length !== 24) throw new Error("invalid user id ");
+
+    const rawData = await prisma.projects.findMany({
+      where: { userId: userId, priority: priority, OR: [{ userId: userId }] },
+      include: { tasks: { where: { status: "completed" } }, _count: true },
+      omit: {
+        v: true,
+        createdAt: true,
+        updatedAt: true,
+        description: true,
+        deadline: true,
+        userId: true,
+      },
+    });
+
+    const insights = rawData.map((project): ProgjectProgressModel => {
+      const progress = (project.tasks.length / project._count.tasks) * 100;
+
+      return {
+        id: project.id,
+        name: project.name,
+        priority: project.priority,
+        status: project.status,
+        progress: Number(progress.toFixed(2)),
+      };
+    });
+
+    return insights;
+  } catch (error) {
+    logger.error(error, "PROGJECTS PROGRESS INTERNAL SERVICE UTIL EXCEPTION");
+  }
+};
+
 export interface ProjectsInsightModel {
   general: GeneralInfo | undefined;
+  progresses: ProgjectProgressModel[] | undefined;
 }
 
 export type ProjectsInsight = (
@@ -83,19 +154,20 @@ export type ProjectsInsight = (
  * @description
  *  ProjectsInsight service provides projects related insight
  *  e.g. projects general info, projects' progress for a
- *  specific user. Use cases e.g. dashboards, and reports
+ *  specific user to be used for e.g. dashboards, and reports
  *
  * @function getGeneralInfo
  *  internal service util would be used for handling
  *  and retrieving projects' general information
- * @function getProgresses
+ * @function getProjectsProgress
  *  internal service util would be used for handling
  *  and retrieving each project progress
  *
  * @param userId to retrieve projects' insights for a specific
  *  user
  * @return projects' insights analytics
- * @example projectsInsights("user-id") // {general: GeneralInfo}
+ * @example
+ * projectsInsights("user-id") // {general: GeneralInfo, progresses: ProjectProgressModel[]}
  */
 
 export const projectsInsight: ProjectsInsight = async (userId) => {
@@ -103,8 +175,9 @@ export const projectsInsight: ProjectsInsight = async (userId) => {
     if (!userId || userId.length !== 24) throw new Error("invalid user id");
 
     const info = await getGeneralInfo(userId, "projects");
+    const progresss = await getProjectsProgress(userId);
 
-    return { general: info };
+    return { general: info, progresses: progresss };
   } catch (error) {
     logger.error(error, "PROJECTS INSIGHT SERVICE EXCEPTION");
   }
@@ -122,14 +195,11 @@ export type TasksInsights = (
  * @description
  *  TasksInsight service provides tasks related insight
  *  e.g. tasks general info, tasks' progress for a
- *  specific user. Use cases e.g. dashboards, and reports
+ *  specific user to be used for e.g. dashboards, and reports
  *
  * @function getGeneralInfo
  *  internal service util would be used for handling
  *  and retrieving tasks' general information
- * @function getProgresses
- *  internal service util would be used for handling
- *  and retrieving each project progress
  *
  * @param userId to retrieve tasks' insights for a specific
  *  user
