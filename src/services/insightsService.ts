@@ -56,6 +56,52 @@ export const projectsInsights: ProjectsInsights = async (userId) => {
       priority: priorityInsights,
     };
   } catch (error) {
-    logger.error(error, "PROJECT INSIGHTS SERVICE EXCEPTION");
+    logger.error(error, "PROJECTS INSIGHTS SERVICE EXCEPTION");
+  }
+};
+
+export type TasksInsights = (userId: string) => Promise<unknown>;
+
+/**
+ * @description
+ *  TasksInsights service provides tasks related insights
+ *  e.g. total tasks, tasks' status & priorities for a
+ *  specific user. Use cases e.g. dashboards, and reports
+ *
+ * @function countModelFields
+ *  util would be used for handling
+ *  and retrieving tasks' insights
+ *
+ * @param userId to retrieve tasks' insights for a specific
+ *  user
+ * @return tasks' insights analytics
+ * @example tasksInsights("user-id") // {total: n, status: {objs}, priority: {objs}}
+ */
+
+export const tasksInsights: TasksInsights = async (userId) => {
+  try {
+    if (!userId || userId.length !== 24) throw new Error("invalid user id");
+
+    const statusInsights = await countModelFields(userId, "tasks", ["status"]);
+    const priorityInsights = await countModelFields(userId, "tasks", [
+      "priority",
+    ]);
+
+    if (!statusInsights || !priorityInsights)
+      throw new Error("failed to get tasks insights");
+
+    const totalTasks = Object.keys(statusInsights).reduce(
+      // @ts-expect-error validated and tested util
+      (acc, curr) => acc + statusInsights[curr]._count,
+      0
+    );
+
+    return {
+      total: totalTasks,
+      status: statusInsights,
+      priority: priorityInsights,
+    };
+  } catch (error) {
+    logger.error(error, "TASKS INSIGHTS SERVICE EXCEPTION");
   }
 };
