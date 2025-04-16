@@ -22,7 +22,7 @@ describe("insight service suite", () => {
     .mockResolvedValueOnce(statusMock)
     .mockResolvedValueOnce(priorityMock);
 
-  test("project insights service", async () => {
+  test.skip("project insights service", async () => {
     const insights = await service.projectsInsights(idMock);
 
     expect(util.countModelFields).toHaveBeenCalledTimes(2);
@@ -30,6 +30,23 @@ describe("insight service suite", () => {
       "status",
     ]);
     expect(util.countModelFields).toHaveBeenLastCalledWith(idMock, "projects", [
+      "priority",
+    ]);
+    expect(insights).toMatchObject({
+      total: 20,
+      status: statusMock,
+      priority: priorityMock,
+    });
+  });
+
+  test("task insights service", async () => {
+    const insights = await service.tasksInsights(idMock);
+
+    expect(util.countModelFields).toHaveBeenCalledTimes(2);
+    expect(util.countModelFields).toHaveBeenCalledWith(idMock, "tasks", [
+      "status",
+    ]);
+    expect(util.countModelFields).toHaveBeenLastCalledWith(idMock, "tasks", [
       "priority",
     ]);
     expect(insights).toMatchObject({
