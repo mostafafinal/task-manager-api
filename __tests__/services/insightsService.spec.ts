@@ -23,7 +23,7 @@ describe("insight service suite", () => {
     .mockResolvedValueOnce(priorityMock);
 
   test("project insights service", async () => {
-    const insights = await service.projectsInsight(idMock);
+    const insights = await service.projectsInsights(idMock);
 
     expect(util.countModelFields).toHaveBeenCalledTimes(2);
     expect(util.countModelFields).toHaveBeenCalledWith(idMock, "projects", [
