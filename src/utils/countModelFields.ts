@@ -63,7 +63,7 @@ export const validateModel: ValidateModel = (modelName, ...fields) => {
 type CountModelFields = (
   userId: string,
   modelName: Prisma.TypeMap["meta"]["modelProps"],
-  ...fields: string[]
+  fields: string[]
 ) => Promise<unknown>;
 
 /**
@@ -83,7 +83,7 @@ type CountModelFields = (
 export const countModelFields: CountModelFields = async (
   userId,
   modelName,
-  ...fields
+  fields
 ) => {
   try {
     if (!validateModel(modelName, ...fields))
