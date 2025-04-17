@@ -30,7 +30,7 @@ export interface CustomError extends Error {
  * @param status i.e. "info" | "error" | "fatal"
  * @default "fatal"
  * @param statusCode HTTP error status code i.e. 500, 400, 401, 404
- * @param message error massage e.g. enternal server error
+ * @param message error massage e.g. internal server error
  * @param data e.g. error data related or null
  * @param details e.g. error datails for development help or null
  * @returns { status: fail, statusCode: 500, data: internal server error, details: ..etc} JSON HTTP Error
@@ -38,7 +38,7 @@ export interface CustomError extends Error {
  */
 
 export const customError = (
-  status: PinoErrorType,
+  status: PinoErrorType = "fatal",
   statusCode: number = 500,
   message: string = "internal server error",
   data: unknown = null,

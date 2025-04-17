@@ -10,7 +10,7 @@
  */
 
 import { prisma } from "../configs/prisma";
-import { Prisma } from "../types/prisma";
+import { $Enums, Prisma, projects, users } from "../types/prisma";
 import { countModelFields } from "../utils/countModelFields";
 import { logger } from "../utils/logger";
 
@@ -21,7 +21,7 @@ export interface GeneralInfo {
 }
 
 export type GetGeneralInfo = (
-  userId: string,
+  userId: users["id"],
   modelName: Prisma.TypeMap["meta"]["modelProps"]
 ) => Promise<GeneralInfo | undefined>;
 
@@ -73,16 +73,16 @@ export const getGeneralInfo: GetGeneralInfo = async (userId, modelName) => {
 };
 
 export interface ProgjectProgressModel {
-  id: Prisma.projectsFieldRefs["id"]["name"];
-  name: Prisma.projectsFieldRefs["name"]["name"];
-  priority: Prisma.projectsFieldRefs["priority"]["name"];
-  status: Prisma.projectsFieldRefs["status"]["name"];
+  id: projects["id"];
+  name: projects["name"];
+  priority: $Enums.Priority;
+  status: $Enums.Status;
   progress: number;
 }
 
 export type GetProjectsProgress = (
-  userId: Prisma.projectsFieldRefs["userId"]["name"],
-  priority?: Prisma.projectsFieldRefs["priority"]["name"]
+  userId: users["id"],
+  priority?: $Enums.Priority
 ) => Promise<ProgjectProgressModel[] | undefined>;
 
 /**
@@ -188,7 +188,7 @@ export interface TasksInsightModel {
 }
 
 export type TasksInsights = (
-  userId: string
+  userId: users["id"]
 ) => Promise<TasksInsightModel | undefined>;
 
 /**

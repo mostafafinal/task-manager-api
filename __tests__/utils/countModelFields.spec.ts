@@ -14,7 +14,7 @@ test("count model properties util", async () => {
   // @ts-expect-error models are dynamic
   prismaMock[modelName].groupBy.mockResolvedValue({ mock: "data-mock" });
 
-  const data = await util.countModelFields(userId, modelName, propName);
+  const data = await util.countModelFields(userId, modelName, [propName]);
 
   expect(util.validateModel).toHaveBeenCalledWith(modelName, propName);
   expect(prismaMock[modelName].groupBy).toHaveBeenCalled();

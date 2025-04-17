@@ -95,7 +95,7 @@ export const loginUser: LoginUser = async (userData) => {
   }
 };
 
-export type ForgetPassword = (userEmail: string) => Promise<void>;
+export type ForgetPassword = (userEmail: users["email"]) => Promise<void>;
 
 /**
  * @description

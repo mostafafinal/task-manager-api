@@ -15,12 +15,17 @@
  */
 
 import { prisma } from "../configs/prisma";
-import { Prisma } from "../types/prisma";
+import { Prisma, users } from "../types/prisma";
 import { logger } from "./logger";
+
+export type ModelsFields =
+  | keyof Prisma.tasksSelect
+  | keyof Prisma.projectsSelect
+  | keyof Prisma.usersSelect;
 
 export type ValidateModel = (
   modelName: Prisma.TypeMap["meta"]["modelProps"],
-  ...fields: string[]
+  ...fields: ModelsFields[]
 ) => boolean | undefined;
 
 /**
@@ -61,9 +66,9 @@ export const validateModel: ValidateModel = (modelName, ...fields) => {
 };
 
 type CountModelFields = (
-  userId: string,
+  userId: users["id"],
   modelName: Prisma.TypeMap["meta"]["modelProps"],
-  fields: string[]
+  fields: ModelsFields[]
 ) => Promise<unknown>;
 
 /**

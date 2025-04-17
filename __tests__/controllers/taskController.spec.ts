@@ -24,7 +24,7 @@ describe("Task controller testing", () => {
     id: faker.database.mongodbObjectId(),
     name: faker.commerce.productName(),
     deadline: faker.date.soon(),
-    status: faker.helpers.arrayElement(["todo", "in-progress", "completed"]),
+    status: faker.helpers.arrayElement(["active", "completed"]),
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
     projectId: faker.database.mongodbObjectId(),

@@ -1,7 +1,12 @@
-import { ErrorMiddleware } from "../types/expressMiddleware";
+import { ErrorRequestHandler } from "express";
 import { httpErrorLogger } from "../utils/logger";
 
-export const errorLogger: ErrorMiddleware = async (error, req, res, next) => {
+export const errorLogger: ErrorRequestHandler = async (
+  error,
+  req,
+  res,
+  next
+) => {
   httpErrorLogger(error);
 
   next(error);

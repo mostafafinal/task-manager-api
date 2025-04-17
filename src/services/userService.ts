@@ -18,7 +18,7 @@ import { ENV_VARS } from "../configs/envs";
 import { logger } from "../utils/logger";
 
 export type GetUserById = (
-  userId: string
+  userId: users["id"]
 ) => Promise<Partial<users> | undefined>;
 
 /**
@@ -50,9 +50,9 @@ export const getUserById: GetUserById = async (userId) => {
 };
 
 export type ChangeUserPassword = (
-  userId: string,
-  oldPassword: string,
-  newPassword: string
+  userId: users["id"],
+  oldPassword: users["password"],
+  newPassword: users["password"]
 ) => Promise<boolean | undefined>;
 
 /**
@@ -109,7 +109,7 @@ export const changeUserPassword: ChangeUserPassword = async (
 
 export type ResetUserPassword = (
   token: string,
-  newPassword: string
+  newPassword: users["password"]
 ) => Promise<boolean | undefined>;
 
 /**
@@ -163,7 +163,9 @@ export const resetUserPassword: ResetUserPassword = async (
  * @example deleteUserById("user-id")
  */
 
-export type DeleteUserById = (userId: string) => Promise<boolean | undefined>;
+export type DeleteUserById = (
+  userId: users["id"]
+) => Promise<boolean | undefined>;
 
 export const deleteUserById: DeleteUserById = async (userId) => {
   try {

@@ -38,7 +38,7 @@ export const createTask: CreateTask = async (taskData) => {
   }
 };
 
-export type GetTask = (taskId: string) => Promise<tasks | undefined>;
+export type GetTask = (taskId: tasks["id"]) => Promise<tasks | undefined>;
 
 /**
  * @description
@@ -64,7 +64,7 @@ export const getTask: GetTask = async (taskId) => {
 };
 
 export type UpdateTask = (
-  taskId: string,
+  taskId: tasks["id"],
   updates: Partial<tasks>
 ) => Promise<tasks | undefined>;
 
@@ -105,7 +105,7 @@ export const updateTask: UpdateTask = async (taskId, updates) => {
  * @example deleteTask("task-id")
  */
 
-export type DeleteTask = (taskId: string) => Promise<tasks | undefined>;
+export type DeleteTask = (taskId: tasks["id"]) => Promise<tasks | undefined>;
 
 export const deleteTask: DeleteTask = async (taskId) => {
   try {

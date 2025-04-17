@@ -8,7 +8,7 @@
  * @copyright Copyrights (c) 2025
  */
 
-import { projects } from "../types/prisma";
+import { projects, users } from "../types/prisma";
 import { prisma } from "../configs/prisma";
 import { logger } from "../utils/logger";
 
@@ -42,7 +42,7 @@ export const createProject: CreateProject = async (projectData) => {
 };
 
 export type GetProjects = (
-  userId: string,
+  userId: users["id"],
   page: number,
   limit: number
 ) => Promise<{ projects: Partial<projects>[]; pages: number } | undefined>;
@@ -59,11 +59,7 @@ export type GetProjects = (
  * @example getProjects("user-id", 2, 10)
  */
 
-export const getProjects: GetProjects = async (
-  userId: string,
-  page: number = 1,
-  limit: number = 20
-) => {
+export const getProjects: GetProjects = async (userId, page, limit) => {
   try {
     if (!userId) throw new Error("user's id's not provided");
 
@@ -95,7 +91,7 @@ export const getProjects: GetProjects = async (
 };
 
 export type GetProject = (
-  projectId: string
+  projectId: projects["id"]
 ) => Promise<Partial<projects> | undefined>;
 
 /**
@@ -135,7 +131,7 @@ export const getProject: GetProject = async (projectId) => {
 };
 
 export type UpdateProject = (
-  projectId: string,
+  projectId: projects["id"],
   updates: Partial<projects>
 ) => Promise<projects | undefined>;
 
@@ -174,7 +170,7 @@ export const updateProject: UpdateProject = async (projectId, updates) => {
  */
 
 export type DeleteProject = (
-  projectId: string
+  projectId: projects["id"]
 ) => Promise<projects | undefined>;
 
 export const deleteProject: DeleteProject = async (projectId) => {

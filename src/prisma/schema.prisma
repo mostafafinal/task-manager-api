@@ -26,8 +26,8 @@ model projects {
   deadline    DateTime @db.Date
   description String?
   name        String
-  priority    String
-  status      String
+  priority    Priority
+  status      Status
   tasks       tasks[]
   user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String   @map("users") @db.ObjectId 
@@ -41,8 +41,8 @@ model tasks {
   deadline    DateTime @db.Date
   description String?
   name        String
-  priority    String
-  status      String
+  priority    Priority
+  status      Status
   project     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String   @map("users") @db.ObjectId
@@ -50,4 +50,15 @@ model tasks {
   createdAt   DateTime? @db.Date @default(now())
   updatedAt   DateTime? @db.Date @updatedAt
   v    Int    @map("__v") @default(0)
+}
+
+enum Status {
+  active
+  completed
+}
+
+enum Priority {
+  low
+  moderate
+  high
 }
