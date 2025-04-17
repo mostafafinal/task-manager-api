@@ -12,6 +12,7 @@
 import { users } from "../../types/prisma";
 import { logger } from "../../utils/logger";
 import { GeneralInfo, getGeneralInfo } from "./utils/getGeneralInfo";
+import { getProductivity, ProductivityInsight } from "./utils/getProductivity";
 import {
   getProjectsProgress,
   ProgjectProgressModel,
@@ -61,6 +62,7 @@ export const projectsInsight: ProjectsInsight = async (userId) => {
 
 export interface TasksInsightModel {
   general: GeneralInfo | undefined;
+  productivity: ProductivityInsight | undefined;
 }
 
 export type TasksInsights = (
@@ -76,6 +78,9 @@ export type TasksInsights = (
  * @function getGeneralInfo
  *  internal service util would be used for handling
  *  and retrieving tasks' general information
+ * @function getProductivity
+ *  internal services util would be used for gathering
+ *  user tasks' productivity
  *
  * @param userId to retrieve tasks' insights for a specific
  *  user
@@ -88,8 +93,9 @@ export const tasksInsights: TasksInsights = async (userId) => {
     if (!userId || userId.length !== 24) throw new Error("invalid user id");
 
     const info = await getGeneralInfo(userId, "tasks");
+    const productivity = await getProductivity(userId, "tasks");
 
-    return { general: info };
+    return { general: info, productivity: productivity };
   } catch (error) {
     logger.error(error, "TASKS INSIGHT SERVICE EXCEPTION");
   }
