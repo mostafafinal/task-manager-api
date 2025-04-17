@@ -14,9 +14,9 @@
  * @copyright Copyrights (c) 2025
  */
 
-import { prisma } from "../configs/prisma";
-import { Prisma, users } from "../types/prisma";
-import { logger } from "./logger";
+import { prisma } from "../../../configs/prisma";
+import { Prisma, users } from "../../../types/prisma";
+import { logger } from "../../../utils/logger";
 
 export type ModelsFields =
   | keyof Prisma.tasksSelect

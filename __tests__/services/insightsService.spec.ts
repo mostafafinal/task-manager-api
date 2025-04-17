@@ -1,11 +1,15 @@
-import * as util from "../../src/utils/countModelFields";
-import * as service from "../../src/services/insightsService";
+import * as genInfo from "../../src/services/insights/utils/getGeneralInfo";
+import * as countModels from "../../src/services/insights/utils/countModelFields";
+import * as progress from "../../src/services/insights/utils/getProjectsProgress";
+import * as service from "../../src/services/insights/insightsService";
 import { faker } from "@faker-js/faker";
 import { prisma } from "../../src/configs/prisma";
 import { projects } from "../../src/types/prisma";
 
 const prismaMock = jest.mocked(prisma);
-jest.mock("../../src/utils/countModelFields");
+jest.mock("../../src/services/insights/utils/getGeneralInfo");
+jest.mock("../../src/services/insights/utils/countModelFields");
+jest.mock("../../src/services/insights/utils/getProjectsProgress");
 
 afterEach(() => jest.clearAllMocks());
 
@@ -19,7 +23,7 @@ describe("insight service suite", () => {
     "0": { _count: 10, priority: "modetate" },
     "1": { _count: 10, priority: "high" },
   };
-  const generalInfoMock: service.GeneralInfo = {
+  const generalInfoMock: genInfo.GeneralInfo = {
     total: 20,
     status: statusMock,
     priority: priorityMock,
@@ -32,7 +36,7 @@ describe("insight service suite", () => {
     tasks: [1, 2, 3, 4, 5], //simulating completed tasks
     _count: { tasks: 10 },
   } as unknown as projects;
-  const progressInsightsMock: service.ProgjectProgressModel[] = [
+  const progressInsightsMock: progress.ProgjectProgressModel[] = [
     {
       id: project.id,
       name: project.name,
@@ -51,20 +55,24 @@ describe("insight service suite", () => {
 
   test("general info internal service util", async () => {
     jest
-      .spyOn(util, "countModelFields")
+      .spyOn(countModels, "countModelFields")
       .mockResolvedValueOnce(statusMock)
       .mockResolvedValueOnce(priorityMock);
 
-    const insights = await service.getGeneralInfo(idMock, "projects");
+    const insights = await genInfo.getGeneralInfo(idMock, "projects");
 
-    expect(util.countModelFields).toHaveBeenCalledTimes(2);
-    expect(util.countModelFields).toHaveBeenCalledWith(idMock, "projects", [
-      "status",
-    ]);
-    expect(util.countModelFields).toHaveBeenLastCalledWith(idMock, "projects", [
-      "priority",
-    ]);
-    expect(insights).toMatchObject<service.GeneralInfo>({
+    expect(countModels.countModelFields).toHaveBeenCalledTimes(2);
+    expect(countModels.countModelFields).toHaveBeenCalledWith(
+      idMock,
+      "projects",
+      ["status"]
+    );
+    expect(countModels.countModelFields).toHaveBeenLastCalledWith(
+      idMock,
+      "projects",
+      ["priority"]
+    );
+    expect(insights).toMatchObject<genInfo.GeneralInfo>({
       total: 20,
       status: statusMock,
       priority: priorityMock,
@@ -74,24 +82,24 @@ describe("insight service suite", () => {
   test("projects progress intenral service util", async () => {
     prismaMock.projects.findMany.mockResolvedValue([project, project]);
 
-    const insights = await service.getProjectsProgress(idMock);
+    const insights = await progress.getProjectsProgress(idMock);
 
     expect(prismaMock.projects.findMany).toHaveBeenCalled();
-    expect(insights).toMatchObject<service.ProgjectProgressModel[]>(
+    expect(insights).toMatchObject<progress.ProgjectProgressModel[]>(
       progressInsightsMock
     );
   });
 
   test("projects insight service", async () => {
-    jest.spyOn(service, "getGeneralInfo").mockResolvedValue(generalInfoMock);
+    jest.spyOn(genInfo, "getGeneralInfo").mockResolvedValue(generalInfoMock);
     jest
-      .spyOn(service, "getProjectsProgress")
+      .spyOn(progress, "getProjectsProgress")
       .mockResolvedValue(progressInsightsMock);
 
     const insights = await service.projectsInsight(idMock);
 
-    expect(service.getGeneralInfo).toHaveBeenCalledWith(idMock, "projects");
-    expect(service.getProjectsProgress).toHaveBeenCalledWith(idMock);
+    expect(genInfo.getGeneralInfo).toHaveBeenCalledWith(idMock, "projects");
+    expect(progress.getProjectsProgress).toHaveBeenCalledWith(idMock);
     expect(insights).toMatchObject<service.ProjectsInsightModel>({
       general: generalInfoMock,
       progresses: progressInsightsMock,
@@ -99,11 +107,11 @@ describe("insight service suite", () => {
   });
 
   test("tasks insight service", async () => {
-    jest.spyOn(service, "getGeneralInfo").mockResolvedValue(generalInfoMock);
+    jest.spyOn(genInfo, "getGeneralInfo").mockResolvedValue(generalInfoMock);
 
     const insights = await service.tasksInsights(idMock);
 
-    expect(service.getGeneralInfo).toHaveBeenCalledWith(idMock, "tasks");
+    expect(genInfo.getGeneralInfo).toHaveBeenCalledWith(idMock, "tasks");
     expect(insights).toMatchObject<service.TasksInsightModel>({
       general: generalInfoMock,
     });
