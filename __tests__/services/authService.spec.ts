@@ -1,4 +1,4 @@
-import { prisma } from "../../src/configs/prisma";
+import { prismaMock } from "../mocks/prisma";
 import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/authService";
 import { users } from "../../src/types/prisma";
@@ -7,7 +7,6 @@ import * as token from "../../src/utils/token";
 import * as mail from "../../src/utils/mail";
 import { JwtPayload } from "jsonwebtoken";
 
-const prismaMock = jest.mocked(prisma);
 jest.mock("../../src/utils/bcryption");
 jest.mock("../../src/utils/mail.ts");
 
@@ -63,7 +62,7 @@ describe("User Authentication Test", () => {
       password: user.password,
     });
 
-    expect(prisma.users.findUnique).toHaveBeenCalled();
+    expect(prismaMock.users.findUnique).toHaveBeenCalled();
     expect(bcrypt.verifyPassword).toHaveBeenCalled();
     expect(login).toMatchObject<users>(user);
   });

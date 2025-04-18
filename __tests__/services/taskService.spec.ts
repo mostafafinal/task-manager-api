@@ -1,16 +1,14 @@
 import * as service from "../../src/services/taskService";
 import { tasks } from "../../src/types/prisma";
 import { faker } from "@faker-js/faker";
-import { prisma } from "../../src/configs/prisma";
-
-const prismaMock = jest.mocked(prisma);
+import { prismaMock } from "../mocks/prisma";
 
 describe("task service testing", () => {
   const task: tasks = {
     id: faker.database.mongodbObjectId(),
     name: faker.commerce.productName(),
     deadline: faker.date.soon(),
-    status: faker.helpers.arrayElement(["active", "completed"]),
+    status: faker.helpers.arrayElement(["todo", "inProgress", "completed"]),
     priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
     description: faker.commerce.productDescription(),
     projectId: faker.database.mongodbObjectId(),

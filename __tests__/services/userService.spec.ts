@@ -1,12 +1,10 @@
-import { prisma } from "../../src/configs/prisma";
+import { prismaMock } from "../mocks/prisma";
 import { faker } from "@faker-js/faker";
 import * as service from "../../src/services/userService";
 import { users } from "../../src/types/prisma";
 import * as bcrypt from "../../src/utils/bcryption";
 import * as token from "../../src/utils/token";
 import { JwtPayload } from "jsonwebtoken";
-
-const prismaMock = jest.mocked(prisma);
 
 describe("User service suite", () => {
   const user: users = {

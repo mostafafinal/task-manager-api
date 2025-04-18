@@ -1,12 +1,10 @@
-import { prisma } from "../../../src/configs/prisma";
+import { prismaMock } from "../../mocks/prisma";
 import { faker } from "@faker-js/faker";
 import * as count from "../../../src/services/insights/utils/countModelFields";
 import * as info from "../../../src/services/insights/utils/getGeneralInfo";
 import * as progress from "../../../src/services/insights/utils/getProjectsProgress";
 import * as prodactivity from "../../../src/services/insights/utils/getProductivity";
 import { Prisma, projects } from "../../../src/types/prisma";
-
-const prismaMock = jest.mocked(prisma);
 
 describe("Internal insights service util suite", () => {
   const idMock = faker.database.mongodbObjectId();

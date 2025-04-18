@@ -1,9 +1,7 @@
 import * as service from "../../src/services/projectService";
-import { prisma } from "../../src/configs/prisma";
+import { prismaMock } from "../mocks/prisma";
 import { faker } from "@faker-js/faker";
 import { projects } from "../../src/types/prisma";
-
-const prismaMock = jest.mocked(prisma);
 
 describe("project service testing", () => {
   const project: projects = {

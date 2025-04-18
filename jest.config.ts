@@ -5,8 +5,7 @@ const config: Config.InitialOptions = {
   preset: "ts-jest",
   testEnvironment: "node",
   verbose: true,
-  testPathIgnorePatterns: ["./node_modules", "./__tests__/mocks"],
-  setupFilesAfterEnv: ["./__tests__/mocks/prisma.ts"],
+  testPathIgnorePatterns: ["./node_modules"],
 };
 
 export default config;
