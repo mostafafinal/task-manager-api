@@ -8,7 +8,7 @@ const errMsg = {
     },
     status: {
       empty: "task status should be determined!",
-      enum: "task status should be todo, in-progress, or completed!",
+      enum: "task status should be todo, inProgress, or completed!",
     },
     deadline: {
       empty: "task deadline should be determined!",
@@ -49,7 +49,7 @@ export const newtask: ValidationChain[] = [
     .trim()
     .withMessage(errMsg.task.status.empty)
     .bail()
-    .isIn(["todo", "in-progress", "completed"])
+    .isIn(["todo", "inProgress", "completed"])
     .withMessage(errMsg.task.status.enum)
     .bail()
     .escape(),
@@ -102,7 +102,7 @@ export const newData: ValidationChain[] = [
     .trim()
     .withMessage(errMsg.task.status.empty)
     .bail()
-    .isIn(["todo", "in-progress", "completed"])
+    .isIn(["todo", "inProgress", "completed"])
     .withMessage(errMsg.task.status.enum)
     .bail()
     .optional()

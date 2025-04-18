@@ -27,7 +27,7 @@ model projects {
   description String?
   name        String
   priority    Priority
-  status      Status
+  status      ProjectStatus
   tasks       tasks[]
   user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String   @map("users") @db.ObjectId 
@@ -42,7 +42,7 @@ model tasks {
   description String?
   name        String
   priority    Priority
-  status      Status
+  status      TaskStatus
   project     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String   @map("users") @db.ObjectId
@@ -52,8 +52,14 @@ model tasks {
   v    Int    @map("__v") @default(0)
 }
 
-enum Status {
+enum ProjectStatus {
   active
+  completed
+}
+
+enum TaskStatus {
+  todo
+  inProgress @map("in-progress")
   completed
 }
 

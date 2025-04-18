@@ -16,7 +16,7 @@ export interface ProgjectProgressModel {
   id: projects["id"];
   name: projects["name"];
   priority: $Enums.Priority;
-  status: $Enums.Status;
+  status: $Enums.ProjectStatus;
   progress: number;
 }
 

@@ -17,7 +17,7 @@ export interface ProductiveModel {
   id: projects["id"] | tasks["id"];
   name: projects["name"] | tasks["name"];
   priority: $Enums.Priority;
-  status: $Enums.Status;
+  status: $Enums.ProjectStatus | $Enums.TaskStatus;
 }
 
 export interface ProductivityInsight {
