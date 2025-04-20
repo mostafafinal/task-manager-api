@@ -11,6 +11,7 @@ import { errorLogger } from "./middlewares/errorLogger";
 import chatRoutes from "./routes/chat";
 import { setupSocket } from "./socket";
 import { createServer } from "http";
+import { logger } from "./utils/logger";
 
 const app = express();
 const httpServer = createServer(app); 
@@ -27,9 +28,9 @@ app.use("/", indexRouter);
 
 app.use(errorLogger, errorHandler);
 
-// Socket.io setup
+//app.listen(ENV_VARS.PORT, () => console.log("connected"));
 setupSocket(httpServer);
 
-httpServer.listen(ENV_VARS.PORT, () => console.log("connected"));
+httpServer.listen(ENV_VARS.PORT, () => logger.info({}, "connected"));
 
 export default app;
