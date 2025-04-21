@@ -14,11 +14,15 @@
 import pino from "pino";
 import { CustomError } from "./customError";
 import { PinoErrorTypeEnum } from "../types/pino";
+import { ENV_VARS } from "../configs/envs";
 
 export const logger = pino({
-  transport: {
-    target: "pino-pretty",
-  },
+  ...(ENV_VARS.NOD_ENV === "development" && {
+    transport: {
+      target: "pino-pretty",
+      options: { colorize: true },
+    },
+  }),
 });
 
 type HttpErrorLogger = (error: CustomError) => void;

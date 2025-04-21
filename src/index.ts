@@ -8,6 +8,7 @@ import indexRouter from "./routes/indexRouter";
 import { errorHandler } from "./middlewares/errorHandler";
 import { ENV_VARS } from "./configs/envs";
 import { errorLogger } from "./middlewares/errorLogger";
+import { logger } from "./utils/logger";
 
 const app = express();
 
@@ -22,6 +23,6 @@ app.use("/", indexRouter);
 
 app.use(errorLogger, errorHandler);
 
-app.listen(ENV_VARS.PORT, () => console.log("connected"));
+app.listen(ENV_VARS.PORT, () => logger.info({}, "connected"));
 
 export default app;
