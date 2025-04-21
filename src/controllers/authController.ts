@@ -65,10 +65,18 @@ export const loginGoogleCB: RegularMiddleware[] = [
   passport.authenticate("google", {
     session: false,
   }),
-  (req, res) => {
-    res.redirect(ENV_VARS.FRONTEND_URL || "/");
-  },
 ];
+
+export const succeededLogin: RegularMiddlewareWithoutNext = async (
+  req,
+  res
+) => {
+  res.json({ status: "success", message: "successfully logged" });
+};
+
+export const clientRedirect: RegularMiddleware = async (req, res) => {
+  res.redirect(ENV_VARS.FRONTEND_URL || "/");
+};
 
 export const forgetPasswordPost: RegularMiddlewareWithoutNext = async (
   req,
