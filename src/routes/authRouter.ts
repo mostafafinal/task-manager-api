@@ -15,7 +15,8 @@ authRouter.post(
   validate.login,
   controller.loginLocal,
   validateUserId,
-  tryCatch(assignToken)
+  assignToken,
+  tryCatch(controller.succeededLogin)
 );
 
 authRouter.get("/google", controller.loginGoogle);
@@ -24,7 +25,8 @@ authRouter.get(
   "/google/callback",
   controller.loginGoogleCB,
   validateUserId,
-  tryCatch(assignToken)
+  assignToken,
+  controller.clientRedirect
 );
 
 authRouter.post(

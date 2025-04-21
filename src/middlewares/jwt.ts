@@ -1,11 +1,11 @@
 import { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
-import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
+import { RegularMiddleware } from "../types/expressMiddleware";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
 import { generateToken } from "../utils/token";
 import { ENV_VARS } from "../configs/envs";
 
-export const assignToken: RegularMiddlewareWithoutNext = async (req, res) => {
+export const assignToken: RegularMiddleware = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
@@ -33,5 +33,5 @@ export const assignToken: RegularMiddlewareWithoutNext = async (req, res) => {
     partitioned: true,
   });
 
-  res.json({ status: "success", message: "successfully logged" });
+  next();
 };
