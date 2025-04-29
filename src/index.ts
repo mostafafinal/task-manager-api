@@ -8,10 +8,11 @@ import indexRouter from "./routes/indexRouter";
 import { errorHandler } from "./middlewares/errorHandler";
 import { ENV_VARS } from "./configs/envs";
 import { errorLogger } from "./middlewares/errorLogger";
-import chatRoutes from "./routes/chat";
+import chatRoutes from "./routes/geminiRouter";
+import { logger } from "./utils/logger";
 import { setupSocket } from "./socket";
 import { createServer } from "http";
-import { logger } from "./utils/logger";
+
 
 const app = express();
 const httpServer = createServer(app); 
