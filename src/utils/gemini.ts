@@ -13,7 +13,6 @@
  * @date 2025-04-29
  */
 
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 dotenv.config();
@@ -23,6 +22,7 @@ dotenv.config();
  *  Async function utilizes the google gemini model to generate a response in plain text.
  *  Prepares a prompt structure, communicates with the API, and returns the generated text.
  *  Handles errors and logs them to the console.
+
  * 
  * @param {string} message - The input message to be sent to the Gemini API.
  * @returns {Promise<string>} - A promise that resolves to the generated response text.
@@ -33,7 +33,6 @@ dotenv.config();
  * const response = await getGeminiResponse("Tell me something to make my day.");
  * console.log(response); // Output: "Here's a positive thought: Every day may not be good, but there's something good in every day."
  */
-
 
 export const getGeminiResponse = async (message: string): Promise<string> => {
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");

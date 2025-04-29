@@ -14,6 +14,7 @@
 
 import { Server as HttpServer } from "http";
 import { Server } from "socket.io";
+
 // import { getGeminiResponse } from "./utils/gemini";
 import { ENV_VARS } from "./configs/envs";
 import { retryGeminiResponse } from "./utils/gemini";
@@ -39,7 +40,6 @@ import { retryGeminiResponse } from "./utils/gemini";
  *  httpServer.listen(3000, () => console.log("Server running on port 3000"));
  */
 
-
 export const setupSocket = (server: HttpServer) => {
   const io = new Server(server, {
     cors: {
@@ -59,6 +59,7 @@ export const setupSocket = (server: HttpServer) => {
         socket.emit("gemini-response", {
           response: "_Sorry, Gemini is temporarily unavailable. Please try again later._",
         });
+
       }
     });
 

@@ -29,7 +29,9 @@ app.use("/", indexRouter);
 
 app.use(errorLogger, errorHandler);
 
-//app.listen(ENV_VARS.PORT, () => console.log("connected"));
+
+// app.listen(ENV_VARS.PORT, () => logger.info({}, "connected"));
+// Socket.io setup
 setupSocket(httpServer);
 
 httpServer.listen(ENV_VARS.PORT, () => logger.info({}, "connected"));
