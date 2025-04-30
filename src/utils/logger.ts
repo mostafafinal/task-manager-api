@@ -48,15 +48,3 @@ export const httpErrorLogger: HttpErrorLogger = (error) => {
     logger.error(error, "HTTP ERROR LOGGER UTIL EXCEPTION");
   }
 };
-
-/**
- * @description
- *  Logs non-HTTP general errors (used for sockets, services)
- *
- * @param message - Descriptive error context
- * @param err - Actual error object
- * @example errorLogger("Socket connection failed", err)
- */
-export const errorLogger = (message: string, err: unknown) => {
-  logger.error({ err }, message);
-};

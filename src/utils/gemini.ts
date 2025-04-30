@@ -6,7 +6,7 @@
  */
 
 import { genAI, GEMINI_MODEL } from "../configs/gemini";
-import { errorLogger } from "./logger";
+import { logger } from "../utils/logger";
 
 // Types
 type GeminiResponse = Promise<string>;
@@ -32,7 +32,7 @@ export const getGeminiResponse = async (message: string): GeminiResponse => {
 
     return text;
   } catch (error) {
-    errorLogger("Gemini API Error", error);
+    logger.error( error , "Gemini API error");
     throw new Error("Failed to fetch a response from Gemini");
   }
 };
@@ -54,9 +54,8 @@ export const retryGeminiResponse = async (
 
     if (retries === 0 || !isOverload) throw err;
 
-    errorLogger(`Retrying Gemini in ${delay}ms...`, err);
+    logger.error(err, `Retrying Gemini in ${delay}ms...`);
     await new Promise((res) => setTimeout(res, delay));
     return retryGeminiResponse(message, retries - 1, delay * 2);
   }
 };
-

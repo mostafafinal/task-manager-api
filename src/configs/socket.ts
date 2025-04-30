@@ -16,7 +16,7 @@ import { Server as HttpServer } from "http";
 import { Server } from "socket.io";
 import { retryGeminiResponse } from "../utils/gemini";
 import { appOpt } from "./corsOpts";
-import { errorLogger } from "../utils/logger";
+import { logger } from "../utils/logger";
 
 /**
  * Sets up the Socket.IO server and its event handlers.
@@ -35,7 +35,7 @@ export const setupSocket = (server: HttpServer) => {
         const response = await retryGeminiResponse(message);
         socket.emit("gemini-response", { response });
       } catch (err) {
-        errorLogger("Gemini socket error:", err);
+        logger.error( err , "Gemini socket error");
         socket.emit("gemini-response", {
           response: "_Sorry, Gemini is temporarily unavailable. Please try again later._",
         });
