@@ -9,8 +9,12 @@ import { errorHandler } from "./middlewares/errorHandler";
 import { ENV_VARS } from "./configs/envs";
 import { errorLogger } from "./middlewares/errorLogger";
 import { logger } from "./utils/logger";
+import { setupSocket } from "./configs/socket";
+import { createServer } from "http";
+
 
 const app = express();
+const httpServer = createServer(app); 
 
 app.use(helmet());
 app.use(cors(appOpt));
@@ -23,6 +27,8 @@ app.use("/", indexRouter);
 
 app.use(errorLogger, errorHandler);
 
-app.listen(ENV_VARS.PORT, () => logger.info({}, "connected"));
+setupSocket(httpServer);
+
+httpServer.listen(ENV_VARS.PORT, () => logger.info({}, "connected"));
 
 export default app;
