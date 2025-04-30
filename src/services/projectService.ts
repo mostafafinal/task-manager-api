@@ -117,6 +117,7 @@ export const getProject: GetProject = async (projectId) => {
             priority: true,
             deadline: true,
             status: true,
+            description: true,
           },
         },
       },
