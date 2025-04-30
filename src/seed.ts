@@ -82,7 +82,7 @@ const fakeTaskData = async (
       id: faker.database.mongodbObjectId(),
       name: faker.commerce.productName(),
       deadline: faker.date.soon(),
-      status: faker.helpers.arrayElement(["active", "completed"]),
+      status: faker.helpers.arrayElement(["todo", "inProgress", "completed"]),
       priority: faker.helpers.arrayElement(["low", "moderate", "high"]),
       description: faker.commerce.productDescription(),
       projectId: projectId,
