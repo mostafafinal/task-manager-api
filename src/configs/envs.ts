@@ -15,4 +15,6 @@ export const ENV_VARS = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   GOOGLE_CB_URL: process.env.GOOGLE_CB_URL,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+  GEMINI_MODEL: process.env.GEMINI_MODEL,
 };
