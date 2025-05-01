@@ -46,7 +46,7 @@
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.21.0",
+    "@eslint/js": "^9.25.1",
     "@faker-js/faker": "^9.5.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.8",
@@ -64,7 +64,7 @@
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.24.1",
     "@typescript-eslint/parser": "^8.24.1",
-    "eslint": "^9.21.0",
+    "eslint": "^9.25.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.2.3",
@@ -77,6 +77,6 @@
     "ts-jest": "^29.3.2",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.1"
+    "typescript-eslint": "^8.31.1"
   }
 }
