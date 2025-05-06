@@ -90,6 +90,35 @@ export const getProjects: GetProjects = async (userId, page, limit) => {
   }
 };
 
+export type QueryProjects = (
+  userId: users["id"],
+  query: string
+) => Promise<projects[] | undefined>;
+
+/**
+ * @description
+ *  QueryProjects service queries the projects model to find
+ *  any query matches e.g. searching for specific projects
+ * @function prisma API would be used for searching projects in the database
+ * @param userId to query specific user projects
+ * @param query to be used in matching projects
+ * @returns founded projects
+ */
+
+export const queryProjects: QueryProjects = async (userId, query) => {
+  try {
+    if (!userId || !query) throw new Error("invalid user or query");
+
+    const projects = await prisma.projects.findMany({
+      where: { userId: userId, name: { contains: query, mode: "insensitive" } },
+    });
+
+    return projects;
+  } catch (error) {
+    logger.error(error, "QUERY PROJECTS SERVICE EXCEPTION");
+  }
+};
+
 export type GetProject = (
   projectId: projects["id"]
 ) => Promise<Partial<projects> | undefined>;
