@@ -1,5 +1,5 @@
-import * as service from "../../src/services/projectService";
 import { prismaMock } from "../mocks/prisma";
+import * as service from "../../src/services/projectService";
 import { faker } from "@faker-js/faker";
 import { projects } from "../../src/types/prisma";
 
@@ -44,6 +44,18 @@ describe("project service testing", () => {
       projects: [project, project],
       pages: pagesNum,
     });
+  });
+
+  test("query project data", async () => {
+    const queryMock = "querying projects...";
+    const userIdMock = faker.database.mongodbObjectId();
+
+    prismaMock.projects.findMany.mockResolvedValue([project]);
+
+    const query = await service.queryProjects(userIdMock, queryMock);
+
+    expect(prismaMock.projects.findMany).toHaveBeenCalled();
+    expect(query).toStrictEqual([project]);
   });
 
   test("get project data", async () => {
