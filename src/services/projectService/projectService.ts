@@ -8,9 +8,9 @@
  * @copyright Copyrights (c) 2025
  */
 
-import { projects, users } from "../types/prisma";
-import { prisma } from "../configs/prisma";
-import { logger } from "../utils/logger";
+import { projects, users } from "../../types/prisma";
+import { prisma } from "../../configs/prisma";
+import { logger } from "../../utils/logger";
 
 export type CreateProject = (data: projects) => Promise<projects | undefined>;
 
@@ -64,7 +64,6 @@ export const getProjects: GetProjects = async (userId, page, limit) => {
     if (!userId) throw new Error("user's id's not provided");
 
     const startIndex: number = (+page - 1) * +limit;
-
     const totalProjects: number = await prisma.projects.count({
       where: { userId: userId },
     });
@@ -73,8 +72,8 @@ export const getProjects: GetProjects = async (userId, page, limit) => {
 
     const projects = await prisma.projects.findMany({
       where: { userId: userId },
-      take: +limit,
-      skip: startIndex,
+      take: Number(limit),
+      skip: Number(startIndex),
       select: {
         id: true,
         name: true,
@@ -105,7 +104,7 @@ export type QueryProjects = (
  * @returns founded projects
  */
 
-export const queryProjects: QueryProjects = async (userId, query) => {
+export const findProjects: QueryProjects = async (userId, query) => {
   try {
     if (!userId || !query) throw new Error("invalid user or query");
 
