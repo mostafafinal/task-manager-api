@@ -1,11 +1,10 @@
 import request, { Response } from "supertest";
 import app from "../../src/index";
 import { faker } from "@faker-js/faker";
-import * as service from "../../src/services/projectService";
+import * as service from "../../src/services/projectService/projectService";
+import * as util from "../../src/services/projectService/queryHandler";
 import { projects } from "../../src/types/prisma";
 import { ENV_VARS } from "../../src/configs/envs";
-
-jest.mock("../../src/services/projectService");
 
 describe("project controller suite", () => {
   const project: projects = {
@@ -38,21 +37,17 @@ describe("project controller suite", () => {
     expect(res.body.data).toBeDefined();
   });
 
-  test("get projects request", async () => {
-    jest.spyOn(service, "getProjects").mockResolvedValue({
-      projects: [project, project] as unknown as [],
-      pages: 100,
-    });
+  test("query projects request", async () => {
+    jest.spyOn(util, "queryHandler").mockResolvedValue([]);
 
     const res: Response = await request(app)
       .get("/projects")
       .set("Cookie", `x-auth-token=${ENV_VARS.JWT_SIGNED_TOKEN}`)
-      .query({ page: "1", limit: "10" });
+      .query({ search: "searching" });
 
-    expect(service.getProjects).toHaveBeenCalled();
+    expect(util.queryHandler).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
     expect(res.body.data).toBeDefined();
-    expect(res.body.data.pages).toBeDefined();
   });
 
   test("get project by id request", async () => {
