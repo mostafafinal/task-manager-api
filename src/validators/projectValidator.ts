@@ -28,6 +28,10 @@ const errMsg = {
     limit: "limit query should be a vaild digit",
     num: "both page and limit should be a valid digits",
   },
+  search: {
+    empty: "no query to search with",
+    string: "invalid query search",
+  },
   param: "project id must be a valid id",
 };
 
@@ -74,7 +78,7 @@ export const newProject: ValidationChain[] = [
     .optional(),
 ];
 
-export const pagination: ValidationChain[] = [
+export const reqQuery: ValidationChain[] = [
   query("page")
     .notEmpty()
     .trim()
@@ -95,6 +99,15 @@ export const pagination: ValidationChain[] = [
     .withMessage(errMsg.query.num)
     .escape()
     .optional(),
+  query("search")
+    .optional()
+    .notEmpty()
+    .trim()
+    .withMessage(errMsg.search.empty)
+    .bail()
+    .isString()
+    .withMessage(errMsg.search.string)
+    .bail(),
 ];
 
 export const newData: ValidationChain[] = [
