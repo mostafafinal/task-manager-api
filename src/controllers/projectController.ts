@@ -1,8 +1,9 @@
-import * as service from "../services/projectService";
+import * as service from "../services/projectService/projectService";
 import { RegularMiddlewareWithoutNext } from "../types/expressMiddleware";
 import { projects } from "../../src/types/prisma";
 import { customError } from "../utils/customError";
 import { matchedData, validationResult } from "express-validator";
+import { Query, queryHandler } from "../services/projectService/queryHandler";
 
 export const createProjectPost: RegularMiddlewareWithoutNext = async (
   req,
@@ -26,18 +27,14 @@ export const createProjectPost: RegularMiddlewareWithoutNext = async (
   });
 };
 
-export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
+export const queryProjects: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
 
-  const data = matchedData(req);
+  const query = matchedData(req);
 
-  const projects = await service.getProjects(
-    data.userId,
-    data.page,
-    data.limit
-  );
+  const projects = await queryHandler(query as Query);
 
   if (!projects) throw customError("fatal");
 
@@ -46,6 +43,21 @@ export const getProjects: RegularMiddlewareWithoutNext = async (req, res) => {
     data: projects,
   });
 };
+
+// export const queryProjects: RegularMiddlewareWithoutNext = async (req, res) => {
+//   const errors = validationResult(req);
+
+//   if (!errors.isEmpty()) throw customError("error", 400, errors.array()[0].msg);
+
+//   const data = matchedData(req);
+
+//   const projects = await service.queryProjects(data.userId, data.search);
+
+//   res.status(200).json({
+//     status: "success",
+//     data: projects,
+//   });
+// };
 
 export const getProject: RegularMiddlewareWithoutNext = async (req, res) => {
   const errors = validationResult(req);
