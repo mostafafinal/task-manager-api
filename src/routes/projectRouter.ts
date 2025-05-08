@@ -11,7 +11,7 @@ projectRouter.use(isAuth, objectId.validateUserId);
 
 projectRouter
   .route("/")
-  .get(validate.pagination, tryCatch(controller.getProjects))
+  .get(validate.reqQuery, tryCatch(controller.queryProjects))
   .post(validate.newProject, tryCatch(controller.createProjectPost));
 
 projectRouter
